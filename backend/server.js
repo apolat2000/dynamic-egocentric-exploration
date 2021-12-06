@@ -42,7 +42,15 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const webPageName = utils.deriveWebPageName(String(webPageURL));
   console.log(webPageName);
 
-  if (currentGraph.nodes.some((e) => e.name === webPageName)) {
+  // already visited
+  const findInExistingGraph = findInNodesByName(
+    webPageName,
+    currentGraph.nodes
+  );
+  if (
+    findInExistingGraph &&
+    currentGraph.nodes.some((e) => e.source === findInExistingGraph.id)
+  ) {
     res.status(200).json(currentGraph);
     return;
   }
@@ -73,6 +81,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     ...nodesToAppend.map((e) => ({ url: e.url, name: e.name, id: e.id })),
   ];
 
+  console.log(nodes);
+
   const webPageInNodes = findInNodesByName(webPageName, nodes);
 
   const linksToAppend = nodesToAppend
@@ -83,6 +93,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     }));
 
   const links = [...currentGraph.links, ...linksToAppend];
+
+  console.log(links);
 
   res.status(200).json({
     nodes,
