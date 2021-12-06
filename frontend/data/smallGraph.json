@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "A",
+      "weight2": "24.2561357984647",
+      "weight1": "3",
+      "desc": "Description for A"
+    },
+    {
+      "id": "B",
+      "weight2": "7.81111471510434",
+      "weight1": "4",
+      "desc": "Description for B"
+    },
+    {
+      "id": "C",
+      "weight2": "7.50297329441021",
+      "weight1": "10",
+      "desc": "Description for C"
+    },
+    {
+      "id": "D",
+      "weight2": "6.8380365444913",
+      "weight1": "10",
+      "desc": "Description for D"
+    }
+  ],
+  "links": [
+    { "source": "A", "target": "B", "weight2": "53.4504939738474" },
+    { "source": "A", "target": "C", "weight2": "45.5491951727553" },
+    { "source": "A", "target": "D", "weight2": "103.856748129292" }
+  ]
+}
