@@ -1,13 +1,12 @@
 .starting-modal {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   background-color: black;
   color: white;
-  z-index: 5;
+  z-index: 2;
   padding: 3rem;
 }
 
@@ -66,5 +65,28 @@
   }
   100% {
     content: "Loading...";
+  }
+}
+
+#usage-blocker {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(30, 30, 30, 0.5);
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .starting-modal {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-bottom: 2rem;
+    padding-top: 0;
+    width: 80%;
+  }
+}
+@media (min-width: 601px) and (max-width: 960px) {
+  .starting-modal {
+    width: 60%;
   }
 }
