@@ -26,7 +26,7 @@ exports.scrapAnchorHrefs = async (webPageURL, options) => {
     return anchorElements;
   } catch (error) {
     console.log(error);
-    return error;
+    return -1;
   }
 };
 

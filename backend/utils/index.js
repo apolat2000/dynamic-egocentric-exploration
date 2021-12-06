@@ -24,3 +24,10 @@ exports.uniqBy = (inputArray, key) => {
 exports.urlRegex = new RegExp(
   /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
 );
+
+const errorMap = new Map();
+errorMap.set(0, "Website doesn't allow navigating.");
+errorMap.set(1, "Bad webPageURL.");
+errorMap.set(-1, "OK.");
+
+exports.errorMap = errorMap;
