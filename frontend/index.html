@@ -7,10 +7,69 @@
     <title>Dynamic Graph Exploration</title>
     <script src="https://unpkg.com/aframe"></script>
     <script src="https://unpkg.com/aframe-forcegraph-component"></script>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <a-scene>
-      <a-entity forcegraph="json-url: myGraphData.json"></a-entity>
+    <div class="starting-modal">
+      <div id="starting-form-wrapper">
+        <h1>Starting web page URL:</h1>
+        <form action="" method="get" class="starting-form">
+          <input
+            type="url"
+            name="starting-web-page"
+            id="starting-web-page-input"
+            style="width: 100%"
+          />
+          <button
+            id="starting-web-page-submit"
+            type="submit"
+            style="margin-left: 2rem"
+          >
+            Start
+          </button>
+        </form>
+      </div>
+      <div id="loader-wrapper" class="loader">
+        <div class="loader-wheel"></div>
+        <div class="loader-text"></div>
+      </div>
+    </div>
+    <a-scene stats>
+      <a-camera
+        look-controls="pointerLockEnabled: true"
+        wasd-controls="fly: true; acceleration: 600;"
+      >
+        <a-cursor
+          animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
+          animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 1500; from: 1 1 1; to: 0.1 0.1 0.1"
+          animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1"
+          fuse="false"
+          color="red"
+          opacity="0.5"
+          raycaster="objects: [forcegraph]"
+        ></a-cursor>
+        <a-text
+          id="forcegraph-tooltip"
+          position="0 -0.25 -1"
+          width="2"
+          align="center"
+          color="lavender"
+        ></a-text>
+      </a-camera>
+      <a-sky color="#002"></a-sky>
+
+      <a-entity
+        forcegraph="
+        json-url: data/miserables.json;
+        node-auto-color-by: group;
+        link-directional-arrow-length: 1.5;
+        link-directional-arrow-rel-pos: 1;
+        on-node-hover: node => document.querySelector('#forcegraph-tooltip').setAttribute('value', node ? node.id : '');
+        on-node-click: node => document.querySelector('#forcegraph-tooltip').setAttribute('value', `Clicked on ${node.id}!`);
+      "
+      ></a-entity>
     </a-scene>
+
+    <script src="main.js"></script>
   </body>
 </html>
