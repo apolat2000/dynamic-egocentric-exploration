@@ -33,14 +33,15 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const webPageURL = req.body.webPageURL;
 
   if (!webPageURL.match(utils.urlRegex)) {
-    res.status(200).json({ success: false, msg: "Bad webPageURL." });
+    res
+      .status(200)
+      .json({ success: false, errorCode: 1, msg: utils.errorMap.get(1) });
     return;
   }
 
   const options = req.body.options || {};
   const currentGraph = req.body.currentGraph || { nodes: [], links: [] };
   const webPageName = utils.deriveWebPageName(String(webPageURL));
-  console.log(webPageName);
 
   // already visited
   const findInExistingGraph = findInNodesByName(
@@ -61,27 +62,39 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     options
   );
 
+  if (allAnchorHrefs === -1) {
+    res.status(200).json({
+      nodes: currentGraph.nodes,
+      links: currentGraph.links,
+      errorCode: 0,
+      success: false,
+      msg: utils.errorMap.get(0),
+    });
+    return;
+  }
+
   const nodesToAppend = utils.uniqBy(
-    await Promise.all(
-      allAnchorHrefs
-        .map(async (url) => {
-          const name = await utils.deriveWebPageName(url);
+    [
+      ...allAnchorHrefs
+        .map((url) => {
+          const name = utils.deriveWebPageName(url);
           return findInNodesByName(name, currentGraph.nodes)
             ? { delete: true }
             : { delete: false, url, name, id: uuidv4() };
         })
         .filter((e) => !e.delete),
-      { url: webPageURL, name: webPageName, id: uuidv4() }
-    ),
+      { url: webPageURL, name: webPageName, id: uuidv4() },
+    ],
     (e) => e.name
   );
 
-  const nodes = [
-    ...currentGraph.nodes,
-    ...nodesToAppend.map((e) => ({ url: e.url, name: e.name, id: e.id })),
-  ];
-
-  console.log(nodes);
+  const nodes = utils.uniqBy(
+    [
+      ...currentGraph.nodes,
+      ...nodesToAppend.map((e) => ({ url: e.url, name: e.name, id: e.id })),
+    ],
+    (e) => e.name
+  );
 
   const webPageInNodes = findInNodesByName(webPageName, nodes);
 
@@ -94,13 +107,15 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const links = [...currentGraph.links, ...linksToAppend];
 
-  console.log(links);
+  console.log("links", links);
+  console.log("nodes", nodes);
 
   res.status(200).json({
     nodes,
     links,
     success: true,
-    msg: "OK",
+    errorCode: -1,
+    msg: utils.errorMap.get(-1),
   });
   return;
 });
