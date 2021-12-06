@@ -9,8 +9,9 @@
     <script src="https://unpkg.com/aframe-forcegraph-component"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
-    <div class="starting-modal">
+    <div class="starting-modal" id="starting-modal">
       <div id="starting-form-wrapper">
         <h1>Starting web page URL:</h1>
         <form action="" method="get" class="starting-form">
@@ -34,6 +35,7 @@
         <div class="loader-text"></div>
       </div>
     </div>
+    <div id="usage-blocker"></div>
     <a-scene stats>
       <a-camera
         look-controls="pointerLockEnabled: true"
@@ -58,18 +60,22 @@
       </a-camera>
       <a-sky color="#002"></a-sky>
 
-      <a-entity
-        forcegraph="
-        json-url: data/miserables.json;
-        node-auto-color-by: group;
-        link-directional-arrow-length: 1.5;
-        link-directional-arrow-rel-pos: 1;
-        on-node-hover: node => document.querySelector('#forcegraph-tooltip').setAttribute('value', node ? node.id : '');
-        on-node-click: node => document.querySelector('#forcegraph-tooltip').setAttribute('value', `Clicked on ${node.id}!`);
-      "
-      ></a-entity>
+      <a-entity id="forcegraph"></a-entity>
     </a-scene>
 
+    <!-- <script type="text/javascript">
+      var scene = document.querySelector("a-scene");
+
+      var inVR = false;
+      scene.addEventListener("enter-vr", function () {
+        console.log("ENTERED VR");
+        inVR = true;
+      });
+      scene.addEventListener("exit-vr", function () {
+        console.log("exited VR");
+        inVR = false;
+      });
+    </script> -->
     <script src="main.js"></script>
   </body>
 </html>
