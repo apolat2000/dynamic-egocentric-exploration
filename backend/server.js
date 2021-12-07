@@ -33,9 +33,11 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const webPageURL = req.body.webPageURL;
 
   if (!webPageURL.match(utils.urlRegex)) {
-    res
-      .status(200)
-      .json({ success: false, errorCode: 1, msg: utils.errorMap.get(1) });
+    res.status(200).json({
+      success: false,
+      errorCode: 1,
+      msg: utils.errorDictionary.badURL,
+    });
     return;
   }
 
@@ -68,7 +70,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       links: currentGraph.links,
       errorCode: 0,
       success: false,
-      msg: utils.errorMap.get(0),
+      msg: utils.errorDictionary.cant,
     });
     return;
   }
@@ -115,7 +117,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     links,
     success: true,
     errorCode: -1,
-    msg: utils.errorMap.get(-1),
+    msg: utils.errorDictionary.ok,
   });
   return;
 });
