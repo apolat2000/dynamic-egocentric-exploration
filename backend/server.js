@@ -75,6 +75,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const nodesToAppend = utils.uniqBy(
     [
+      { url: webPageURL, name: webPageName, id: uuidv4() },
       ...allAnchorHrefs
         .map((url) => {
           const name = utils.deriveWebPageName(url);
@@ -83,7 +84,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
             : { delete: false, url, name, id: uuidv4() };
         })
         .filter((e) => !e.delete),
-      { url: webPageURL, name: webPageName, id: uuidv4() },
     ],
     (e) => e.name
   );
@@ -98,7 +98,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const webPageInNodes = findInNodesByName(webPageName, nodes);
 
-  const linksToAppend = nodesToAppend
+  const linksToAppend = nodes
     .filter((e) => e.name !== webPageName)
     .map((e) => ({
       source: webPageInNodes.id,
