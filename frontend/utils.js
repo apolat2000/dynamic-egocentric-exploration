@@ -1,10 +1,33 @@
-import { frameGraphAttributeAppend, urlRegex } from "./constants";
+import {
+  frameGraphAttributeAppend,
+  urlRegex,
+  explorationType,
+  promptMessages,
+  nodeSize,
+} from "./constants";
 import {
   setLoading,
   getLoading,
   setCurrentNodePosition,
   getCurrentNodePosition,
+  getCurrentNodeId,
+  setCurrentNodeId,
+  addToDeadEndNodes,
+  getDeadEndNodes,
 } from "./state";
+
+const nodeObjectHandler = (node) => {
+  let geometry = new THREE.SphereGeometry(nodeSize, nodeSize, nodeSize);
+  let material;
+  console.log(getCurrentNodeId());
+  if (getDeadEndNodes().includes(node.id))
+    material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  else if (node.id === getCurrentNodeId())
+    material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  else material = new THREE.MeshBasicMaterial({ color: 0x778899 });
+  const mesh = new THREE.Mesh(geometry, material);
+  return mesh;
+};
 
 const apiConnector = (webPageURL, currentGraph, endpointURL) => {
   return fetch(`http://10.101.249.13:8000/${endpointURL}`, {
@@ -53,25 +76,40 @@ const clickHandler = async (node) => {
     return;
   }
 
-  let theNode;
+  setCurrentNodeId(node.id);
 
-  document
-    .querySelector("#forcegraph-tooltip")
-    .setAttribute("value", `Clicked on ${node.name}!`);
+  if (getDeadEndNodes().includes(node.id)) return;
+
+  let theNode;
 
   // already visited
   if (readNodesAndLinks().links.some((e) => e.source === node.id)) {
+    if (explorationType === "free")
+      document
+        .querySelector("#forcegraph-tooltip")
+        .setAttribute(
+          "value",
+          promptMessages.get("nothingNew").replace("#", node.name)
+        );
+
     theNode = findNodeByName(node.name);
 
     setTimeout(function () {
       const nodePosition = theNode.__threeObj.position;
       setCurrentNodePosition(nodePosition);
-      moveCameraToPosition(nodePosition);
+      if (explorationType !== "free") moveCameraToPosition(nodePosition);
     }, 500);
     return;
   }
 
   setLoading(true);
+
+  document
+    .querySelector("#forcegraph-tooltip")
+    .setAttribute(
+      "value",
+      promptMessages.get("loading").replace("#", node.name)
+    );
 
   document.getElementById("loader-wrapper").style.display = "block";
   document.getElementById("usage-blocker").style.display = "block";
@@ -87,7 +125,11 @@ const clickHandler = async (node) => {
   if (apiResponse.errorCode === 0) {
     document
       .querySelector("#forcegraph-tooltip")
-      .setAttribute("value", apiResponse.msg);
+      .setAttribute(
+        "value",
+        promptMessages.get("cantNavigate").replace("#", node.name)
+      );
+    addToDeadEndNodes(node.id);
   }
 
   document.getElementById("loader-wrapper").style.display = "none";
@@ -95,15 +137,14 @@ const clickHandler = async (node) => {
 
   setLoading(false);
 
-  if (apiResponse.success)
-    setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
+  setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
 
   theNode = findNodeByName(node.name);
 
   setTimeout(function () {
     const nodePosition = theNode.__threeObj.position;
     setCurrentNodePosition(nodePosition);
-    moveCameraToPosition(nodePosition);
+    if (explorationType !== "free") moveCameraToPosition(nodePosition);
   }, 500);
 
   return;
@@ -152,7 +193,7 @@ const submitURLHandler = async (event) => {
   ).json();
 
   if (!apiResponse.success) {
-    window.alert(apiResponse.msg);
+    window.alert(promptMessages.get(apiResponse.msg));
     document.getElementById("starting-web-page-submit").disabled = false;
     document.getElementById("starting-web-page-input").disabled = false;
     document.getElementById("loader-wrapper").style.display = "none";
@@ -161,17 +202,24 @@ const submitURLHandler = async (event) => {
     return;
   }
 
+  setNodesAndLinks({
+    nodes: apiResponse.nodes,
+    links: apiResponse.links,
+  });
+
+  setCurrentNodeId(apiResponse.nodes[0].id);
+
   document.getElementById("starting-modal").style.display = "none";
   document.getElementById("usage-blocker").style.display = "none";
 
   setLoading(false);
-  window.setInterval(
-    () =>
-      moveCameraToPosition(getCurrentNodePosition() || { x: 0, y: 0, z: 0 }),
-    1000
-  );
-
-  setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
+  if (explorationType !== "free") {
+    window.setInterval(
+      () =>
+        moveCameraToPosition(getCurrentNodePosition() || { x: 0, y: 0, z: 0 }),
+      1000
+    );
+  }
 };
 
 const moveCameraToPosition = (position) => {
@@ -192,4 +240,5 @@ export {
   clickHandler,
   submitURLHandler,
   moveCameraToPosition,
+  nodeObjectHandler,
 };
