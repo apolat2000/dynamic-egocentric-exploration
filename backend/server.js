@@ -116,8 +116,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     nodesToAppend.some((e) => e.name === value.name)
   );
 
-  console.log(newLinks);
-
   // all new source-target tuples
   const linksToAppend = newLinks
     .filter((e) => e.name !== webPageName)
