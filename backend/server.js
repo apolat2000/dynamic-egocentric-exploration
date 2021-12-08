@@ -14,18 +14,6 @@ const webScrapper = require("./utils/webScrapper");
 const utils = require("./utils");
 const { v4: uuidv4 } = require("uuid");
 
-app.get("/get-neighboring-web-pages", async function (req, res) {
-  const webPageURL = req.body.webPageURL;
-  const options = req.body.options || {};
-
-  const allAnchorHrefs = await webScrapper.scrapAnchorHrefs(
-    webPageURL,
-    options
-  );
-
-  res.status(200).json({ allAnchorHrefs });
-});
-
 const findInNodesByName = (name, nodes) => nodes.find((e) => e.name === name);
 
 // returns the nodes and links appended to the graph sent with the request
@@ -34,6 +22,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   if (!webPageURL.match(utils.urlRegex)) {
     res.status(200).json({
+      nodes: currentGraph.nodes,
+      links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.badURL,
     });
