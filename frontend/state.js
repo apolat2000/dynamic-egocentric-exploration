@@ -1,6 +1,8 @@
 import { findNodeById } from "./utils";
 
 let loading;
+let inVR = false;
+
 let currentNodePosition;
 let currentNodeId;
 let loadingNodeName;
@@ -11,6 +13,11 @@ const setLoading = (payload) => {
   loading = payload;
 };
 const getLoading = () => loading;
+
+const setInVR = (payload) => {
+  inVR = payload;
+};
+const getInVR = () => inVR;
 
 const setCurrentNodePosition = (payload) => {
   currentNodePosition = payload;
@@ -42,6 +49,8 @@ const getVisitedNodes = () => visitedNodes;
 export {
   setLoading,
   getLoading,
+  setInVR,
+  getInVR,
   getCurrentNodePosition,
   setCurrentNodePosition,
   getCurrentNodeId,

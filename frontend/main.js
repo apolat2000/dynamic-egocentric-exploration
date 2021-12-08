@@ -13,7 +13,7 @@ import {
   isProduction,
   defaultURL,
 } from "./constants";
-import { setLoading } from "./state";
+import { setLoading, setInVR } from "./state";
 
 /* INIT */
 setLoading(false);
@@ -24,8 +24,22 @@ window.hoverHandler = hoverHandler;
 window.nodeObjectHandler = nodeObjectHandler;
 window.linkObjectHandler = linkObjectHandler;
 
-if (isProduction)
-  document.getElementById("a-frame-scene").setAttribute("stats", true);
+const scene = document.getElementById("a-frame-scene");
+
+scene.addEventListener("enter-vr", function () {
+  const aText = document.getElementById("forcegraph-tooltip");
+  aText.setAttribute("position", "0 -0.25 -2");
+  aText.setAttribute("width", 1.5);
+  setInVR(true);
+});
+scene.addEventListener("exit-vr", function () {
+  const aText = document.getElementById("forcegraph-tooltip");
+  aText.setAttribute("position", "0 -0.25 -1");
+  aText.setAttribute("width", 2);
+  setInVR(false);
+});
+
+if (isProduction) scene.setAttribute("stats", true);
 
 document
   .getElementById("forcegraph")
