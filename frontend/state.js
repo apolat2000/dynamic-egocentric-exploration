@@ -5,6 +5,7 @@ let currentNodePosition;
 let currentNodeId;
 let loadingNodeName;
 let deadEndNodes = [];
+let visitedNodes = [];
 
 const setLoading = (payload) => {
   loading = payload;
@@ -33,6 +34,11 @@ const addToDeadEndNodes = (id) => {
 };
 const getDeadEndNodes = () => deadEndNodes;
 
+const addToVisitedNodes = (id) => {
+  visitedNodes.push(id);
+};
+const getVisitedNodes = () => visitedNodes;
+
 export {
   setLoading,
   getLoading,
@@ -44,4 +50,6 @@ export {
   getLoadingNodeName,
   addToDeadEndNodes,
   getDeadEndNodes,
+  addToVisitedNodes,
+  getVisitedNodes,
 };

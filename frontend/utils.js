@@ -21,6 +21,8 @@ import {
   getLoadingNodeName,
   addToDeadEndNodes,
   getDeadEndNodes,
+  addToVisitedNodes,
+  getVisitedNodes,
 } from "./state";
 
 const linkHasCurrentNodeAsSource = ({ source, target }) => {
@@ -50,11 +52,13 @@ const nodeObjectHandler = (node) => {
   let material;
   if (getDeadEndNodes().includes(node.id))
     material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  else if (node.id === getCurrentNodeId()) {
+  else if (node.id === getCurrentNodeId())
     material = new THREE.MeshBasicMaterial(
       explorationType === "free" ? { color: 0x00ff00 } : { visible: false }
     );
-  } else material = new THREE.MeshBasicMaterial({ color: 0x778899 });
+  else if (getVisitedNodes().includes(node.id))
+    material = new THREE.MeshBasicMaterial({ color: 0x999900 });
+  else material = new THREE.MeshBasicMaterial({ color: 0x778899 });
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
 };
@@ -178,8 +182,7 @@ const clickHandler = async (node) => {
     return;
   }
 
-  console.log(apiResponse.nodes);
-  console.log(apiResponse.links);
+  addToVisitedNodes(node.id);
 
   setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
 
@@ -257,6 +260,8 @@ const submitURLHandler = async (event) => {
     document.getElementById("usage-blocker").style.display = "block";
     return;
   }
+
+  addToVisitedNodes(apiResponse.webPageId);
 
   setNodesAndLinks({
     nodes: apiResponse.nodes,
