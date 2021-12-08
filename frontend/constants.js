@@ -2,11 +2,19 @@ const explorationType = "free";
 // const explorationType = "egoBubble";
 // const explorationType = "egoHighlight";
 
-const nodeSize = 8;
+const nodeSize = 4;
 
-const frameGraphAttributeAppend = `node-auto-color-by: group; link-curvature: ${
+const linkWidth = 1.5;
+const linkColor = 0x000000;
+const linkOpacity = 0.2;
+const arrowLength = 5;
+
+const frameGraphAttributeAppend = `num-dimensions: 3; link-curvature: ${
   explorationType === "free" ? "0.05" : "0"
-}; link-directional-arrow-length: 1.5; node-rel-size: ${nodeSize}; node-auto-color-by: isBeingHovered; link-directional-arrow-rel-pos: 1; node-three-object: node => nodeObjectHandler(node); on-node-hover: node => hoverHandler(node); on-node-click: node => clickHandler(node)`;
+}; link-directional-arrow-length: ${arrowLength}; link-color: ${linkColor};
+link-opacity: ${linkOpacity}; node-auto-color-by: isBeingHovered; link-width: ${linkWidth};
+link-directional-arrow-rel-pos: 1; node-rel-size: ${nodeSize}; node-three-object: node => nodeObjectHandler(node);
+on-node-hover: node => hoverHandler(node); on-node-click: node => clickHandler(node)`;
 
 const cameraWasdAttributeAppend = `${
   explorationType === "free" ? "fly: true; acceleration: 350;" : ""
