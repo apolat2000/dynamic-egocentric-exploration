@@ -60,17 +60,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     options
   );
 
-  if (allAnchorHrefs.length === 0) {
-    res.status(200).json({
-      nodes: currentGraph.nodes,
-      links: currentGraph.links,
-      success: false,
-      msg: utils.errorDictionary.deadEnd,
-      webPageId: -1,
-    });
-    return;
-  }
-
   if (allAnchorHrefs === -1) {
     res.status(200).json({
       nodes: currentGraph.nodes,
@@ -82,8 +71,29 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     return;
   }
 
+  const pureAnchorHrefs = allAnchorHrefs.filter(
+    (e) => e.match(utils.urlRegex) && e !== ""
+  );
+
+  console.log("pureAnchorHrefs", pureAnchorHrefs);
+
+  if (
+    pureAnchorHrefs.filter(
+      (url) => utils.deriveWebPageName(url) !== webPageName
+    ).length === 0
+  ) {
+    res.status(200).json({
+      nodes: currentGraph.nodes,
+      links: currentGraph.links,
+      success: false,
+      msg: utils.errorDictionary.deadEnd,
+      webPageId: -1,
+    });
+    return;
+  }
+
   const allAnchorHrefsWithNameAndURL = utils.uniqBy(
-    allAnchorHrefs.map((url) => ({ url, name: utils.deriveWebPageName(url) })),
+    pureAnchorHrefs.map((url) => ({ url, name: utils.deriveWebPageName(url) })),
     (e) => e.name
   );
 
@@ -116,6 +126,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     (e) => !findInNodesByName(e.name, currentGraph.nodes)
   );
 
+  console.log([...linkTargetsAlreadyInCurrentGraph, ...novelLinkTargets]);
+
   // all new source-target tuples
   const linksToAppend = [
     ...linkTargetsAlreadyInCurrentGraph,
@@ -129,8 +141,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const links = [...currentGraph.links, ...linksToAppend];
 
-  console.log("links", links);
-  console.log("nodes", nodes);
+  // console.log("links", links);
+  // console.log("nodes", nodes);
 
   res.status(200).json({
     nodes,
