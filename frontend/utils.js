@@ -17,6 +17,8 @@ import {
   getCurrentNodePosition,
   getCurrentNodeId,
   setCurrentNodeId,
+  setLoadingNodeName,
+  getLoadingNodeName,
   addToDeadEndNodes,
   getDeadEndNodes,
 } from "./state";
@@ -138,12 +140,13 @@ const clickHandler = async (node) => {
   }
 
   setLoading(true);
+  setLoadingNodeName(node.name);
 
   document
     .querySelector("#forcegraph-tooltip")
     .setAttribute(
       "value",
-      promptMessages.get("loading").replace("#", node.name)
+      promptMessages.get("loading").replace("#", getLoadingNodeName())
     );
 
   document.getElementById("loader-wrapper").style.display = "block";
@@ -160,6 +163,7 @@ const clickHandler = async (node) => {
   document.getElementById("loader-wrapper").style.display = "none";
   document.getElementById("usage-blocker").style.display = "none";
 
+  setLoadingNodeName(null);
   setLoading(false);
 
   if (apiResponse.msg === "cantNavigate" || apiResponse.msg === "deadEnd") {
@@ -203,9 +207,17 @@ const findNodeById = (id) => {
 };
 
 const hoverHandler = (node) => {
-  document
-    .querySelector("#forcegraph-tooltip")
-    .setAttribute("value", node ? node.name : "");
+  if (getLoading())
+    document
+      .querySelector("#forcegraph-tooltip")
+      .setAttribute(
+        "value",
+        promptMessages.get("loading").replace("#", getLoadingNodeName())
+      );
+  else
+    document
+      .querySelector("#forcegraph-tooltip")
+      .setAttribute("value", node ? node.name : "");
 };
 
 const submitURLHandler = async (event) => {
