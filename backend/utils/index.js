@@ -29,7 +29,7 @@ const errorDictionary = {
   notAllowed: "notAllowed",
   badURL: "badURL",
   ok: "ok",
-  cant: "cant",
+  cantNavigate: "cantNavigate",
   deadEnd: "deadEnd",
 };
 

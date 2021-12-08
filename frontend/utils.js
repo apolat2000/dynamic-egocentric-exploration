@@ -162,7 +162,7 @@ const clickHandler = async (node) => {
 
   setLoading(false);
 
-  if (apiResponse.msg === "cant" || apiResponse.msg === "deadEnd") {
+  if (apiResponse.msg === "cantNavigate" || apiResponse.msg === "deadEnd") {
     document
       .querySelector("#forcegraph-tooltip")
       .setAttribute(

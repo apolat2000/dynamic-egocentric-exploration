@@ -78,7 +78,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       nodes: currentGraph.nodes,
       links: currentGraph.links,
       success: false,
-      msg: utils.errorDictionary.cant,
+      msg: utils.errorDictionary.cantNavigate,
     });
     return;
   }
