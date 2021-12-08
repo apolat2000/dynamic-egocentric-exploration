@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dynamic Graph Exploration</title>
-    <script src="dependencies/aframe.js"></script>
+    <script src="https://unpkg.com/aframe@1.2.0/dist/aframe-master.min.js"></script>
     <script src="https://unpkg.com/aframe-forcegraph-component"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -37,24 +37,26 @@
     </div>
     <div id="usage-blocker"></div>
     <a-scene id="a-frame-scene">
-      <a-camera id="camera" look-controls="pointerLockEnabled: true">
-        <a-cursor
-          animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
-          animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 1500; from: 1 1 1; to: 0.1 0.1 0.1"
-          animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1"
-          fuse="false"
-          color="red"
-          opacity="0.5"
-          raycaster="objects: [forcegraph]"
-        ></a-cursor>
-        <a-text
-          id="forcegraph-tooltip"
-          position="0 -0.25 -1"
-          width="2"
-          align="center"
-          color="lavender"
-        ></a-text>
-      </a-camera>
+      <a-entity position="0 20 50" id="rig">
+        <a-camera id="camera" look-controls="pointerLockEnabled: true">
+          <a-cursor
+            animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
+            animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 1500; from: 1 1 1; to: 0.1 0.1 0.1"
+            animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1"
+            fuse="false"
+            color="red"
+            opacity="0.5"
+            raycaster="objects: [forcegraph]"
+          ></a-cursor>
+          <a-text
+            id="forcegraph-tooltip"
+            position="0 -0.25 -1"
+            width="2"
+            align="center"
+            color="lavender"
+          ></a-text>
+        </a-camera>
+      </a-entity>
       <a-sky color="#002"></a-sky>
 
       <a-entity id="forcegraph"></a-entity>

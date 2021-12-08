@@ -2,6 +2,7 @@ import { findNodeById } from "./utils";
 
 let loading;
 let inVR = false;
+let vrMovementIntervalId;
 
 let currentNodePosition;
 let currentNodeId;
@@ -18,6 +19,11 @@ const setInVR = (payload) => {
   inVR = payload;
 };
 const getInVR = () => inVR;
+
+const setVrMovementIntervalId = (payload) => {
+  vrMovementIntervalId = payload;
+};
+const getVrMovementIntervalId = () => vrMovementIntervalId;
 
 const setCurrentNodePosition = (payload) => {
   currentNodePosition = payload;
@@ -46,11 +52,15 @@ const addToVisitedNodes = (id) => {
 };
 const getVisitedNodes = () => visitedNodes;
 
+const getNVisitedNodes = () => visitedNodes.length;
+
 export {
   setLoading,
   getLoading,
   setInVR,
   getInVR,
+  setVrMovementIntervalId,
+  getVrMovementIntervalId,
   getCurrentNodePosition,
   setCurrentNodePosition,
   getCurrentNodeId,
@@ -61,4 +71,5 @@ export {
   getDeadEndNodes,
   addToVisitedNodes,
   getVisitedNodes,
+  getNVisitedNodes,
 };
