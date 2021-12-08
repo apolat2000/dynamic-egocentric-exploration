@@ -40,7 +40,7 @@ const urlRegex = new RegExp(
 );
 
 const promptMessages = new Map();
-promptMessages.set("loading", "Loading links coming out of #...");
+promptMessages.set("loading", "Loading links from #...");
 promptMessages.set("cantNavigate", "# does not allow navigation.");
 promptMessages.set("nothingNew", "Nothing new in #.");
 promptMessages.set("deadEnd", "# is a dead end.");
