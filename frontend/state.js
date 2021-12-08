@@ -1,3 +1,5 @@
+import { findNodeById } from "./utils";
+
 let loading;
 let currentNodePosition;
 let currentNodeId;
@@ -13,7 +15,9 @@ const setCurrentNodePosition = (payload) => {
   currentNodePosition = payload;
 };
 
-const getCurrentNodePosition = () => currentNodePosition;
+const getCurrentNodePosition = () => {
+  return findNodeById(getCurrentNodeId()).__threeObj.position;
+};
 
 const setCurrentNodeId = (payload) => {
   currentNodeId = payload;
