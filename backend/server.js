@@ -73,41 +73,54 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     return;
   }
 
-  // all outgoing hrefs and the web page itself
-  const nodesToAppend = utils.uniqBy(
-    [
-      { url: webPageURL, name: webPageName, id: uuidv4() },
-      ...allAnchorHrefs
-        .map((url) => {
-          const name = utils.deriveWebPageName(url);
-          return findInNodesByName(name, currentGraph.nodes)
-            ? { delete: true }
-            : { delete: false, url, name, id: uuidv4() };
-        })
-        .filter((e) => !e.delete),
-    ],
+  const allAnchorHrefsWithNameAndURL = utils.uniqBy(
+    allAnchorHrefs.map((url) => ({ url, name: utils.deriveWebPageName(url) })),
     (e) => e.name
   );
 
-  // nodes of status quo graph plus the new web page plus all outgoing hrefs
-  const nodes = utils.uniqBy(
-    [
-      ...currentGraph.nodes,
-      ...nodesToAppend.map((e) => ({ url: e.url, name: e.name, id: e.id })),
-    ],
+  // all outgoing hrefs, which don't already exist in current graph
+  const novelNodes = utils.uniqBy(
+    allAnchorHrefsWithNameAndURL
+      .map((e) => {
+        return findInNodesByName(e.name, currentGraph.nodes)
+          ? false
+          : { ...e, id: uuidv4() };
+      })
+      .filter((e) => e),
     (e) => e.name
   );
+
+  // nodes of status quo graph, the new web page and all outgoing hrefs
+  const nodes = utils.uniqBy(
+    [...currentGraph.nodes, ...novelNodes],
+    (e) => e.name
+  );
+
+  console.log("nodes", nodes);
+
+  const linkTargetsAlreadyInCurrentGraph = allAnchorHrefsWithNameAndURL
+    .filter((e) => findInNodesByName(e.name, currentGraph.nodes))
+    .map((e) => findInNodesByName(e.name, currentGraph.nodes));
+
+  const novelLinkTargets = novelNodes.filter(
+    (e) => !findInNodesByName(e.name, currentGraph.nodes)
+  );
+
+  console.log(
+    linkTargetsAlreadyInCurrentGraph,
+    "linkTargetsAlreadyInCurrentGraph"
+  );
+
+  console.log(novelLinkTargets, "novelLinkTargets");
 
   // get the complete object of the newly navigated web page
   const webPageInNodes = findInNodesByName(webPageName, nodes);
 
-  // mathematical set intersection of old nodes and outgoing hrefs
-  const newLinks = nodes.filter((value) =>
-    nodesToAppend.some((e) => e.name === value.name)
-  );
-
   // all new source-target tuples
-  const linksToAppend = newLinks
+  const linksToAppend = [
+    ...linkTargetsAlreadyInCurrentGraph,
+    ...novelLinkTargets,
+  ]
     .filter((e) => e.name !== webPageName)
     .map((e) => ({
       source: webPageInNodes.id,
@@ -116,8 +129,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const links = [...currentGraph.links, ...linksToAppend];
 
-  // console.log("links", links);
-  // console.log("nodes", nodes);
+  console.log("links", links);
+  console.log("nodes", nodes);
 
   res.status(200).json({
     nodes,

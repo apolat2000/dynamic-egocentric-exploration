@@ -13,6 +13,9 @@ exports.deriveWebPageName = (URL, options) => {
   return mainDomain;
 };
 
+exports.countInArrayByName = (inputArray, name) =>
+  inputArray.reduce((n, x) => n + (x.name === name), 0);
+
 exports.uniqBy = (inputArray, key) => {
   let seen = new Set();
   return inputArray.filter((item) => {
