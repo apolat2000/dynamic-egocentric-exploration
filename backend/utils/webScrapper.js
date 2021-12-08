@@ -8,7 +8,7 @@ exports.scrapAnchorHrefs = async (webPageURL, options) => {
     const page = await browser.newPage();
 
     // Specify page url
-    await page.goto(webPageURL);
+    await page.goto(webPageURL, { timeout: 10000 });
     console.log("page has been loaded!");
 
     // Evaluate/Compute the main task:
@@ -30,6 +30,7 @@ exports.scrapAnchorHrefs = async (webPageURL, options) => {
   }
 };
 
+// not used since it slows down the process
 exports.deriveWebPageName = async (webPageURL, options) => {
   try {
     const browser = await puppeteer.launch();
