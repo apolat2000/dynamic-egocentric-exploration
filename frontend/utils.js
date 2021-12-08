@@ -19,7 +19,6 @@ import {
 const nodeObjectHandler = (node) => {
   let geometry = new THREE.SphereGeometry(nodeSize, nodeSize, nodeSize);
   let material;
-  console.log(getCurrentNodeId());
   if (getDeadEndNodes().includes(node.id))
     material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   else if (node.id === getCurrentNodeId())
@@ -223,7 +222,6 @@ const submitURLHandler = async (event) => {
 };
 
 const moveCameraToPosition = (position) => {
-  console.log("hey");
   const camera = document.getElementById("camera");
   //   const currentNodePosition = getCurrentNodePosition();
   //   if (!currentNodePosition) {
