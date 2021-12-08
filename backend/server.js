@@ -35,7 +35,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   if (!webPageURL.match(utils.urlRegex)) {
     res.status(200).json({
       success: false,
-      errorCode: 1,
       msg: utils.errorDictionary.badURL,
     });
     return;
@@ -64,17 +63,27 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     options
   );
 
+  if (allAnchorHrefs.length === 0) {
+    res.status(200).json({
+      nodes: currentGraph.nodes,
+      links: currentGraph.links,
+      success: false,
+      msg: utils.errorDictionary.deadEnd,
+    });
+    return;
+  }
+
   if (allAnchorHrefs === -1) {
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
-      errorCode: 0,
       success: false,
       msg: utils.errorDictionary.cant,
     });
     return;
   }
 
+  // all outgoing hrefs and the web page itself
   const nodesToAppend = utils.uniqBy(
     [
       { url: webPageURL, name: webPageName, id: uuidv4() },
@@ -90,6 +99,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     (e) => e.name
   );
 
+  // nodes of status quo graph plus the new web page plus all outgoing hrefs
   const nodes = utils.uniqBy(
     [
       ...currentGraph.nodes,
@@ -98,9 +108,18 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     (e) => e.name
   );
 
+  // get the complete object of the newly navigated web page
   const webPageInNodes = findInNodesByName(webPageName, nodes);
 
-  const linksToAppend = nodes
+  // mathematical set intersection of old nodes and outgoing hrefs
+  const newLinks = nodes.filter((value) =>
+    nodesToAppend.some((e) => e.name === value.name)
+  );
+
+  console.log(newLinks);
+
+  // all new source-target tuples
+  const linksToAppend = newLinks
     .filter((e) => e.name !== webPageName)
     .map((e) => ({
       source: webPageInNodes.id,
@@ -109,14 +128,13 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const links = [...currentGraph.links, ...linksToAppend];
 
-  console.log("links", links);
-  console.log("nodes", nodes);
+  // console.log("links", links);
+  // console.log("nodes", nodes);
 
   res.status(200).json({
     nodes,
     links,
     success: true,
-    errorCode: -1,
     msg: utils.errorDictionary.ok,
   });
   return;

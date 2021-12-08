@@ -30,6 +30,7 @@ const errorDictionary = {
   badURL: "badURL",
   ok: "ok",
   cant: "cant",
+  deadEnd: "deadEnd",
 };
 
 exports.errorDictionary = errorDictionary;
