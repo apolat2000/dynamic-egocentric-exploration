@@ -34,6 +34,7 @@ const errorDictionary = {
   ok: "ok",
   cantNavigate: "cantNavigate",
   deadEnd: "deadEnd",
+  alreadyVisited: "alreadyVisited",
 };
 
 exports.errorDictionary = errorDictionary;

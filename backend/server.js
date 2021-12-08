@@ -26,6 +26,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.badURL,
+      webPageId: webPageInNodes.id,
     });
     return;
   }
@@ -43,7 +44,13 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     findInExistingGraph &&
     currentGraph.nodes.some((e) => e.source === findInExistingGraph.id)
   ) {
-    res.status(200).json(currentGraph);
+    res.status(200).json({
+      nodes: currentGraph.nodes,
+      links: currentGraph.links,
+      success: true,
+      msg: utils.errorDictionary.alreadyVisited,
+      webPageId: -1,
+    });
     return;
   }
 
@@ -59,6 +66,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.deadEnd,
+      webPageId: -1,
     });
     return;
   }
@@ -69,6 +77,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.cantNavigate,
+      webPageId: -1,
     });
     return;
   }
@@ -96,7 +105,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     (e) => e.name
   );
 
-  console.log("nodes", nodes);
+  // get the complete object of the newly navigated web page
+  const webPageInNodes = findInNodesByName(webPageName, nodes);
 
   const linkTargetsAlreadyInCurrentGraph = allAnchorHrefsWithNameAndURL
     .filter((e) => findInNodesByName(e.name, currentGraph.nodes))
@@ -105,16 +115,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const novelLinkTargets = novelNodes.filter(
     (e) => !findInNodesByName(e.name, currentGraph.nodes)
   );
-
-  console.log(
-    linkTargetsAlreadyInCurrentGraph,
-    "linkTargetsAlreadyInCurrentGraph"
-  );
-
-  console.log(novelLinkTargets, "novelLinkTargets");
-
-  // get the complete object of the newly navigated web page
-  const webPageInNodes = findInNodesByName(webPageName, nodes);
 
   // all new source-target tuples
   const linksToAppend = [
@@ -137,6 +137,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     links,
     success: true,
     msg: utils.errorDictionary.ok,
+    webPageId: webPageInNodes.id,
   });
   return;
 });
