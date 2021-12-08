@@ -4,6 +4,11 @@ import {
   explorationType,
   promptMessages,
   nodeSize,
+  nodeResolution,
+  linkWidth,
+  linkColor,
+  linkOpacity,
+  defaultURL,
 } from "./constants";
 import {
   setLoading,
@@ -16,16 +21,51 @@ import {
   getDeadEndNodes,
 } from "./state";
 
+const linkHasCurrentNodeAsSource = ({ source, target }) => {
+  return getCurrentNodeId() === source;
+};
+
+const linkHasCurrentNodeAsTarget = ({ source, target }) => {
+  return getCurrentNodeId() === target;
+};
+
+const linkIsConnectedToCurrentNode = ({ source, target }) => {
+  return (
+    linkHasCurrentNodeAsSource({ source, target }) ||
+    linkHasCurrentNodeAsTarget({ source, target })
+  );
+};
+
+// const nodeIsChildOfCurrentNode = (id) => {
+// }
+
 const nodeObjectHandler = (node) => {
-  let geometry = new THREE.SphereGeometry(nodeSize, nodeSize, nodeSize);
+  const geometry = new THREE.SphereGeometry(
+    nodeSize,
+    nodeResolution,
+    nodeResolution
+  );
   let material;
   if (getDeadEndNodes().includes(node.id))
     material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  else if (node.id === getCurrentNodeId())
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  else material = new THREE.MeshBasicMaterial({ color: 0x778899 });
+  else if (node.id === getCurrentNodeId()) {
+    material = new THREE.MeshBasicMaterial(
+      explorationType === "free" ? { color: 0x00ff00 } : { visible: false }
+    );
+  } else material = new THREE.MeshBasicMaterial({ color: 0x778899 });
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
+};
+
+const linkObjectHandler = (link) => {
+  const geometry = new THREE.CylinderGeometry(linkWidth, linkWidth, 2, 2);
+  let material = new THREE.MeshLambertMaterial({
+    color: linkColor,
+    opacity: linkOpacity,
+    transparent: true,
+    visible: !linkHasCurrentNodeAsSource(link) || explorationType === "free",
+  });
+  return new THREE.Mesh(geometry, material);
 };
 
 const apiConnector = (webPageURL, currentGraph, endpointURL) => {
@@ -79,8 +119,6 @@ const clickHandler = async (node) => {
 
   if (getDeadEndNodes().includes(node.id)) return;
 
-  let theNode;
-
   // already visited
   if (readNodesAndLinks().links.some((e) => e.source === node.id)) {
     if (explorationType === "free")
@@ -91,13 +129,11 @@ const clickHandler = async (node) => {
           promptMessages.get("nothingNew").replace("#", node.name)
         );
 
-    theNode = findNodeByName(node.name);
-
     setTimeout(function () {
-      const nodePosition = theNode.__threeObj.position;
+      const nodePosition = getCurrentNodePosition();
       setCurrentNodePosition(nodePosition);
       if (explorationType !== "free") moveCameraToPosition(nodePosition);
-    }, 500);
+    }, 1000);
     return;
   }
 
@@ -121,30 +157,33 @@ const clickHandler = async (node) => {
     )
   ).json();
 
-  if (apiResponse.errorCode === 0) {
-    document
-      .querySelector("#forcegraph-tooltip")
-      .setAttribute(
-        "value",
-        promptMessages.get("cantNavigate").replace("#", node.name)
-      );
-    addToDeadEndNodes(node.id);
-  }
-
   document.getElementById("loader-wrapper").style.display = "none";
   document.getElementById("usage-blocker").style.display = "none";
 
   setLoading(false);
 
+  if (apiResponse.msg === "cant" || apiResponse.msg === "deadEnd") {
+    document
+      .querySelector("#forcegraph-tooltip")
+      .setAttribute(
+        "value",
+        promptMessages.get(apiResponse.msg).replace("#", node.name)
+      );
+    addToDeadEndNodes(node.id);
+    findNodeById(node.id).__threeObj.material.color = new THREE.Color(0xff0000);
+    return;
+  }
+
+  console.log(apiResponse.nodes);
+  console.log(apiResponse.links);
+
   setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
 
-  theNode = findNodeByName(node.name);
-
   setTimeout(function () {
-    const nodePosition = theNode.__threeObj.position;
+    const nodePosition = getCurrentNodePosition();
     setCurrentNodePosition(nodePosition);
     if (explorationType !== "free") moveCameraToPosition(nodePosition);
-  }, 500);
+  }, 1000);
 
   return;
 };
@@ -154,6 +193,13 @@ const findNodeByName = (name) => {
     .getElementById("forcegraph")
     .getAttribute("forcegraph")
     .nodes.find((e) => e.name == name);
+};
+
+const findNodeById = (id) => {
+  return document
+    .getElementById("forcegraph")
+    .getAttribute("forcegraph")
+    .nodes.find((e) => e.id == id);
 };
 
 const hoverHandler = (node) => {
@@ -166,8 +212,7 @@ const submitURLHandler = async (event) => {
   event.preventDefault();
 
   const inputValue =
-    document.getElementById("starting-web-page-input").value ||
-    "https://apolat2000.github.io/";
+    document.getElementById("starting-web-page-input").value || defaultURL;
 
   if (!inputValue.match(urlRegex)) {
     window.alert("Bad webPageURL.");
@@ -212,13 +257,13 @@ const submitURLHandler = async (event) => {
   document.getElementById("usage-blocker").style.display = "none";
 
   setLoading(false);
-  if (explorationType !== "free") {
-    window.setInterval(
-      () =>
-        moveCameraToPosition(getCurrentNodePosition() || { x: 0, y: 0, z: 0 }),
-      1000
-    );
-  }
+  // if (explorationType !== "free") {
+  //   window.setInterval(
+  //     () =>
+  //       moveCameraToPosition(getCurrentNodePosition() || { x: 0, y: 0, z: 0 }),
+  //     1000
+  //   );
+  // }
 };
 
 const moveCameraToPosition = (position) => {
@@ -239,4 +284,6 @@ export {
   submitURLHandler,
   moveCameraToPosition,
   nodeObjectHandler,
+  linkObjectHandler,
+  findNodeById,
 };

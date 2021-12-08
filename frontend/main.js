@@ -3,12 +3,15 @@ import {
   clickHandler,
   submitURLHandler,
   nodeObjectHandler,
+  linkObjectHandler,
 } from "./utils";
 import {
+  explorationType,
   frameGraphAttributeAppend,
   cameraWasdAttributeAppend,
   cameraPositionAttributeAppend,
   isProduction,
+  defaultURL,
 } from "./constants";
 import { setLoading } from "./state";
 
@@ -19,6 +22,7 @@ setLoading(false);
 window.clickHandler = clickHandler;
 window.hoverHandler = hoverHandler;
 window.nodeObjectHandler = nodeObjectHandler;
+window.linkObjectHandler = linkObjectHandler;
 
 if (isProduction)
   document.getElementById("a-frame-scene").setAttribute("stats", true);
@@ -39,3 +43,5 @@ document
 document
   .getElementById("starting-web-page-submit")
   .addEventListener("click", submitURLHandler, false);
+
+document.getElementById("starting-web-page-input").value = defaultURL;
