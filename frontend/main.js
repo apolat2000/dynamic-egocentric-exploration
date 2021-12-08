@@ -8,6 +8,7 @@ import {
   frameGraphAttributeAppend,
   cameraWasdAttributeAppend,
   cameraPositionAttributeAppend,
+  isProduction,
 } from "./constants";
 import { setLoading } from "./state";
 
@@ -18,6 +19,9 @@ setLoading(false);
 window.clickHandler = clickHandler;
 window.hoverHandler = hoverHandler;
 window.nodeObjectHandler = nodeObjectHandler;
+
+if (isProduction)
+  document.getElementById("a-frame-scene").setAttribute("stats", true);
 
 document
   .getElementById("forcegraph")

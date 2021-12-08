@@ -1,4 +1,5 @@
 const explorationType = "free";
+const isProduction = false;
 // const explorationType = "egoBubble";
 // const explorationType = "egoHighlight";
 
@@ -41,4 +42,5 @@ export {
   urlRegex,
   promptMessages,
   nodeSize,
+  isProduction,
 };
