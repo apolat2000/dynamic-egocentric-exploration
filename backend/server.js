@@ -72,7 +72,8 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   }
 
   const pureAnchorHrefs = allAnchorHrefs.filter(
-    (e) => e.match(utils.urlRegex) && e !== "" && e !== "#"
+    (e) =>
+      e.match(utils.urlRegex) && e !== "" && e !== "#" && !e.includes("mailto")
   );
 
   console.log("pureAnchorHrefs", pureAnchorHrefs);
