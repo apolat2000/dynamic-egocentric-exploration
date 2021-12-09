@@ -20,7 +20,7 @@ exports.scrapAnchorHrefs = async (webPageURL, options) => {
     console.log("Page has been evaluated!");
 
     // End Puppeteer
-    await browser.close();
+    browser.close();
 
     // Send response
     return anchorElements;
@@ -37,7 +37,7 @@ exports.deriveWebPageName = async (webPageURL, options) => {
     const page = await browser.newPage();
     await page.goto(webPageURL);
     const title = await page.title();
-    await browser.close();
+    browser.close();
     return title;
   } catch (error) {
     return error;
