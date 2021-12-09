@@ -4,7 +4,7 @@ import {
   submitURLHandler,
   nodeObjectHandler,
   linkObjectHandler,
-  moveTowardsDirection,
+  moveForwards,
 } from "./utils";
 import {
   explorationType,
@@ -18,8 +18,8 @@ import {
   setLoading,
   setInVR,
   getInVR,
-  setVrMovementIntervalId,
-  getVrMovementIntervalId,
+  setForwardMovementIntervalId,
+  getForwardMovementIntervalId,
 } from "./state";
 
 /* INIT */
@@ -66,44 +66,51 @@ document
   .getElementById("starting-web-page-submit")
   .addEventListener("click", submitURLHandler, false);
 
-document
-  .getElementById("a-frame-scene")
-  .addEventListener("mousedown", function () {
-    if (getInVR()) {
-      if (getVrMovementIntervalId()) clearInterval(getVrMovementIntervalId());
-      const intervalId = setInterval(() => {
-        moveTowardsDirection();
-      }, 200);
-      setVrMovementIntervalId(intervalId);
-      console.log(intervalId);
-    }
+if (explorationType === "free")
+  document
+    .getElementById("a-frame-scene")
+    .addEventListener("mousedown", function () {
+      if (getInVR()) {
+        if (getForwardMovementIntervalId())
+          clearInterval(getForwardMovementIntervalId());
+        const intervalId = setInterval(() => {
+          moveForwards();
+        }, 200);
+        setForwardMovementIntervalId(intervalId);
+        console.log(intervalId);
+      }
+    });
+
+if (explorationType === "free")
+  document.getElementById("a-frame-scene").addEventListener("mouseup", () => {
+    if (explorationType === "free")
+      if (getInVR()) {
+        clearInterval(getForwardMovementIntervalId());
+        setForwardMovementIntervalId(null);
+      }
   });
 
-document.getElementById("a-frame-scene").addEventListener("mouseup", () => {
-  if (getInVR()) {
-    clearInterval(getVrMovementIntervalId());
-    setVrMovementIntervalId(null);
-  }
-});
+if (explorationType === "free")
+  document
+    .getElementById("a-frame-scene")
+    .addEventListener("touchstart", function () {
+      if (getInVR()) {
+        if (getForwardMovementIntervalId())
+          clearInterval(getForwardMovementIntervalId());
+        const intervalId = setInterval(() => {
+          moveForwards();
+        }, 200);
+        setForwardMovementIntervalId(intervalId);
+        console.log(intervalId);
+      }
+    });
 
-document
-  .getElementById("a-frame-scene")
-  .addEventListener("touchstart", function () {
+if (explorationType === "free")
+  document.getElementById("a-frame-scene").addEventListener("touchend", () => {
     if (getInVR()) {
-      if (getVrMovementIntervalId()) clearInterval(getVrMovementIntervalId());
-      const intervalId = setInterval(() => {
-        moveTowardsDirection();
-      }, 200);
-      setVrMovementIntervalId(intervalId);
-      console.log(intervalId);
+      clearInterval(getForwardMovementIntervalId());
+      setForwardMovementIntervalId(null);
     }
   });
-
-document.getElementById("a-frame-scene").addEventListener("touchend", () => {
-  if (getInVR()) {
-    clearInterval(getVrMovementIntervalId());
-    setVrMovementIntervalId(null);
-  }
-});
 
 document.getElementById("starting-web-page-input").value = defaultURL;

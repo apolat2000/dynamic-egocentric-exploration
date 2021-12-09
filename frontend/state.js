@@ -2,13 +2,19 @@ import { findNodeById } from "./utils";
 
 let loading;
 let inVR = false;
-let vrMovementIntervalId;
+let forwardMovementIntervalId;
+
+let egocentricMovementIntervalId;
 
 let currentNodePosition;
 let currentNodeId;
+
 let loadingNodeName;
+
 let deadEndNodes = [];
 let visitedNodes = [];
+
+let currentGraph = { nodes: [], links: [] };
 
 const setLoading = (payload) => {
   loading = payload;
@@ -20,17 +26,26 @@ const setInVR = (payload) => {
 };
 const getInVR = () => inVR;
 
-const setVrMovementIntervalId = (payload) => {
-  vrMovementIntervalId = payload;
+const setCurrentGraph = (payload) => {
+  currentGraph = payload;
 };
-const getVrMovementIntervalId = () => vrMovementIntervalId;
+const getCurrentGraph = () => currentGraph;
+
+const setForwardMovementIntervalId = (payload) => {
+  forwardMovementIntervalId = payload;
+};
+const getForwardMovementIntervalId = () => forwardMovementIntervalId;
+
+const setEgocentricMovementIntervalId = (payload) => {
+  egocentricMovementIntervalId = payload;
+};
+const getEgocentricMovementIntervalId = () => egocentricMovementIntervalId;
 
 const setCurrentNodePosition = (payload) => {
   currentNodePosition = payload;
 };
-const getCurrentNodePosition = () => {
-  return findNodeById(getCurrentNodeId()).__threeObj.position;
-};
+const getCurrentNodePosition = () =>
+  findNodeById(getCurrentNodeId()).__threeObj.position;
 
 const setCurrentNodeId = (payload) => {
   currentNodeId = payload;
@@ -59,8 +74,10 @@ export {
   getLoading,
   setInVR,
   getInVR,
-  setVrMovementIntervalId,
-  getVrMovementIntervalId,
+  setForwardMovementIntervalId,
+  getForwardMovementIntervalId,
+  setEgocentricMovementIntervalId,
+  getEgocentricMovementIntervalId,
   getCurrentNodePosition,
   setCurrentNodePosition,
   getCurrentNodeId,
@@ -72,4 +89,6 @@ export {
   addToVisitedNodes,
   getVisitedNodes,
   getNVisitedNodes,
+  setCurrentGraph,
+  getCurrentGraph,
 };

@@ -23,6 +23,10 @@ import {
   getDeadEndNodes,
   addToVisitedNodes,
   getVisitedNodes,
+  setCurrentGraph,
+  getCurrentGraph,
+  setEgocentricMovementIntervalId,
+  getEgocentricMovementIntervalId,
 } from "./state";
 
 const linkHasCurrentNodeAsSource = ({ source, target }) => {
@@ -40,8 +44,12 @@ const linkIsConnectedToCurrentNode = ({ source, target }) => {
   );
 };
 
-// const nodeIsChildOfCurrentNode = (id) => {
-// }
+const nodeIsChildOfCurrentNode = (id) => {
+  console.log(getCurrentGraph().links);
+  return getCurrentGraph().links.some(
+    (e) => e.target === id && e.source === getCurrentNodeId()
+  );
+};
 
 const nodeObjectHandler = (node) => {
   const geometry = new THREE.SphereGeometry(
@@ -56,25 +64,52 @@ const nodeObjectHandler = (node) => {
     material = new THREE.MeshBasicMaterial(
       explorationType === "free" ? { color: 0x00ff00 } : { visible: false }
     );
+  else if (explorationType !== "free" && nodeIsChildOfCurrentNode(node.id))
+    material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
   else if (getVisitedNodes().includes(node.id))
     material = new THREE.MeshBasicMaterial({ color: 0x999900 });
-  else material = new THREE.MeshBasicMaterial({ color: 0x778899 });
+  // yellow
+  else material = new THREE.MeshBasicMaterial({ color: 0x778899 }); // gray
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
 };
 
 const linkObjectHandler = (link) => {
-  const geometry = new THREE.CylinderGeometry(linkWidth, linkWidth, 2, 2);
-  let material = new THREE.MeshLambertMaterial({
-    color: linkColor,
-    opacity: linkOpacity,
-    transparent: true,
-    visible: !linkHasCurrentNodeAsSource(link) || explorationType === "free",
-  });
+  let geometry;
+  let material;
+  if (explorationType === "free") {
+    geometry = new THREE.CylinderGeometry(linkWidth, linkWidth, 2, 2);
+    material = new THREE.MeshLambertMaterial({
+      color: linkColor,
+      opacity: linkOpacity,
+      transparent: true,
+      visible: !linkHasCurrentNodeAsSource(link) || explorationType === "free",
+    });
+  } else {
+    geometry = new THREE.CylinderGeometry(0.4, 0.4, 2, 2);
+    material = new THREE.MeshLambertMaterial({
+      color: linkColor,
+      opacity: linkOpacity,
+      transparent: true,
+      visible: !linkHasCurrentNodeAsSource(link) || explorationType === "free",
+    });
+  }
   return new THREE.Mesh(geometry, material);
 };
 
-const moveTowardsDirection = () => {
+const moveCameraToPosition = ({ x, y, z }) => {
+  const rig = document.getElementById("camera-rig");
+  rig.setAttribute(
+    "animation",
+    `property: position; dur: 800; to: ${x} ${y} ${z}; easing: linear;`
+  );
+  setTimeout(() => {
+    rig.setAttribute("position", ` ${x} ${y} ${z}`);
+  }, 800);
+  return;
+};
+
+const moveForwards = () => {
   const camera = document.getElementById("camera");
   const rig = document.getElementById("camera-rig");
   const {
@@ -91,10 +126,7 @@ const moveTowardsDirection = () => {
     } ${posZ}; easing: linear;`
   );
   setTimeout(() => {
-    rig.setAttribute(
-      "position",
-      `${posX - rot.y / 10} ${posY + rot.x / 10} ${posZ}`
-    );
+    rig.object3D.position.set(posX - rot.y / 10, posY + rot.x / 10, posZ);
   }, 200);
 };
 
@@ -149,6 +181,9 @@ const clickHandler = async (node) => {
 
   if (getDeadEndNodes().includes(node.id)) return;
 
+  if (explorationType !== "free")
+    clearInterval(getEgocentricMovementIntervalId());
+
   // already visited
   if (readNodesAndLinks().links.some((e) => e.source === node.id)) {
     if (explorationType === "free")
@@ -163,7 +198,7 @@ const clickHandler = async (node) => {
       const nodePosition = getCurrentNodePosition();
       setCurrentNodePosition(nodePosition);
       if (explorationType !== "free") moveCameraToPosition(nodePosition);
-    }, 1000);
+    }, 1);
     return;
   }
 
@@ -188,6 +223,8 @@ const clickHandler = async (node) => {
     )
   ).json();
 
+  setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
+
   document.getElementById("loader-wrapper").style.display = "none";
   document.getElementById("usage-blocker").style.display = "none";
 
@@ -210,11 +247,16 @@ const clickHandler = async (node) => {
 
   setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
 
-  setTimeout(function () {
-    const nodePosition = getCurrentNodePosition();
-    setCurrentNodePosition(nodePosition);
-    if (explorationType !== "free") moveCameraToPosition(nodePosition);
-  }, 1000);
+  if (explorationType !== "free")
+    setEgocentricMovementIntervalId(
+      window.setInterval(
+        () =>
+          moveCameraToPosition(
+            getCurrentNodePosition() || { x: 0, y: 0, z: 0 }
+          ),
+        800
+      )
+    );
 
   return;
 };
@@ -275,6 +317,8 @@ const submitURLHandler = async (event) => {
     )
   ).json();
 
+  setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
+
   if (!apiResponse.success) {
     window.alert(promptMessages.get(apiResponse.msg));
     document.getElementById("starting-web-page-submit").disabled = false;
@@ -292,29 +336,23 @@ const submitURLHandler = async (event) => {
     links: apiResponse.links,
   });
 
-  setCurrentNodeId(apiResponse.nodes[0].id);
+  setCurrentNodeId(apiResponse.webPageId);
 
   document.getElementById("starting-modal").style.display = "none";
   document.getElementById("usage-blocker").style.display = "none";
 
   setLoading(false);
-  // if (explorationType !== "free") {
-  //   window.setInterval(
-  //     () =>
-  //       moveCameraToPosition(getCurrentNodePosition() || { x: 0, y: 0, z: 0 }),
-  //     1000
-  //   );
-  // }
-};
-
-const moveCameraToPosition = (position) => {
-  const camera = document.getElementById("camera");
-  //   const currentNodePosition = getCurrentNodePosition();
-  //   if (!currentNodePosition) {
-  //     return;
-  //   }
-  camera.setAttribute("position", `${position.x} ${position.y} ${position.z}`);
-  return;
+  if (apiResponse && explorationType !== "free") {
+    setEgocentricMovementIntervalId(
+      window.setInterval(
+        () =>
+          moveCameraToPosition(
+            getCurrentNodePosition() || { x: 0, y: 0, z: 0 }
+          ),
+        800
+      )
+    );
+  }
 };
 
 export {
@@ -324,7 +362,7 @@ export {
   clickHandler,
   submitURLHandler,
   moveCameraToPosition,
-  moveTowardsDirection,
+  moveForwards,
   nodeObjectHandler,
   linkObjectHandler,
   findNodeById,
