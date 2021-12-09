@@ -74,6 +74,30 @@ const linkObjectHandler = (link) => {
   return new THREE.Mesh(geometry, material);
 };
 
+const moveTowardsDirection = () => {
+  const camera = document.getElementById("camera");
+  const rig = document.getElementById("camera-rig");
+  const {
+    x: posX,
+    y: posY,
+    z: posZ,
+  } = new THREE.Vector3().setFromMatrixPosition(camera.object3D.matrixWorld);
+  console.log(posX, posY, posZ);
+  const rot = camera.getAttribute("rotation");
+  rig.setAttribute(
+    "animation",
+    `property: position; dur: 200; to: ${posX - rot.y / 10} ${
+      posY + rot.x / 10
+    } ${posZ}; easing: linear;`
+  );
+  setTimeout(() => {
+    rig.setAttribute(
+      "position",
+      `${posX - rot.y / 10} ${posY + rot.x / 10} ${posZ}`
+    );
+  }, 200);
+};
+
 const apiConnector = (webPageURL, currentGraph, endpointURL) => {
   return fetch(`http://10.101.249.13:8000/${endpointURL}`, {
     method: "POST",
@@ -300,6 +324,7 @@ export {
   clickHandler,
   submitURLHandler,
   moveCameraToPosition,
+  moveTowardsDirection,
   nodeObjectHandler,
   linkObjectHandler,
   findNodeById,

@@ -4,6 +4,7 @@ import {
   submitURLHandler,
   nodeObjectHandler,
   linkObjectHandler,
+  moveTowardsDirection,
 } from "./utils";
 import {
   explorationType,
@@ -34,14 +35,15 @@ const scene = document.getElementById("a-frame-scene");
 
 scene.addEventListener("enter-vr", function () {
   const aText = document.getElementById("forcegraph-tooltip");
-  aText.setAttribute("position", "0 -0.25 -2");
-  aText.setAttribute("width", 1.5);
+  // when "0 - 25 -1", the text is not visible in VR (Android phone Firefox browser)
+  aText.setAttribute("position", "0 -0.25 -3");
+
   setInVR(true);
 });
 scene.addEventListener("exit-vr", function () {
   const aText = document.getElementById("forcegraph-tooltip");
   aText.setAttribute("position", "0 -0.25 -1");
-  aText.setAttribute("width", 2);
+
   setInVR(false);
 });
 
@@ -64,28 +66,11 @@ document
   .getElementById("starting-web-page-submit")
   .addEventListener("click", submitURLHandler, false);
 
-const moveTowardsDirection = () => {
-  const camera = document.getElementById("camera");
-  const rig = document.getElementById("rig");
-  const pos = new THREE.Vector3();
-  const { x, y, z } = pos.setFromMatrixPosition(camera.object3D.matrixWorld);
-  const rot = camera.getAttribute("rotation");
-  rig.setAttribute(
-    "animation",
-    `property: position; dur: 200; to: ${x - rot.y / 10} ${
-      y + rot.x / 10
-    } ${z}; easing: linear;`
-  );
-  setTimeout(() => {
-    rig.setAttribute("position", `${x - rot.y / 10} ${y + rot.x / 10} ${z}`);
-  }, 200);
-};
-
 document
   .getElementById("a-frame-scene")
   .addEventListener("mousedown", function () {
     if (getInVR()) {
-      clearInterval(getVrMovementIntervalId());
+      if (getVrMovementIntervalId()) clearInterval(getVrMovementIntervalId());
       const intervalId = setInterval(() => {
         moveTowardsDirection();
       }, 200);
@@ -97,8 +82,7 @@ document
 document.getElementById("a-frame-scene").addEventListener("mouseup", () => {
   if (getInVR()) {
     clearInterval(getVrMovementIntervalId());
-    getVrMovementIntervalId(null);
-    console.log("cleared");
+    setVrMovementIntervalId(null);
   }
 });
 
@@ -106,7 +90,7 @@ document
   .getElementById("a-frame-scene")
   .addEventListener("touchstart", function () {
     if (getInVR()) {
-      clearInterval(getVrMovementIntervalId());
+      if (getVrMovementIntervalId()) clearInterval(getVrMovementIntervalId());
       const intervalId = setInterval(() => {
         moveTowardsDirection();
       }, 200);
@@ -118,8 +102,7 @@ document
 document.getElementById("a-frame-scene").addEventListener("touchend", () => {
   if (getInVR()) {
     clearInterval(getVrMovementIntervalId());
-    getVrMovementIntervalId(null);
-    console.log("cleared");
+    setVrMovementIntervalId(null);
   }
 });
 

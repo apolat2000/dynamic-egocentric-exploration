@@ -8,7 +8,7 @@ exports.scrapAnchorHrefs = async (webPageURL, options) => {
     const page = await browser.newPage();
 
     // Specify page url
-    await page.goto(webPageURL, { timeout: 10000 });
+    await page.goto(webPageURL, { timeout: 15000 });
     console.log("page has been loaded!");
 
     // Evaluate/Compute the main task:
