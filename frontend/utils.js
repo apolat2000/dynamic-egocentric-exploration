@@ -67,10 +67,13 @@ const nodeObjectHandler = (node) => {
     material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   else if (node.id === getCurrentNodeId())
     material = new THREE.MeshBasicMaterial(
-      explorationType === "free" ? { color: 0x00ff00 } : { visible: false }
+      explorationType === "free"
+        ? { color: 0x00ff00 /* green */ }
+        : { visible: false }
     );
   else if (explorationType !== "free" && nodeIsChildOfCurrentNode(node.id))
-    material = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+    material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  // green
   else if (getVisitedNodes().includes(node.id))
     material = new THREE.MeshBasicMaterial({ color: 0x999900 });
   // yellow
