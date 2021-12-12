@@ -1,1 +1,1 @@
-# dynamic-graph-exploration
+# Dynamic Graph Exploration
