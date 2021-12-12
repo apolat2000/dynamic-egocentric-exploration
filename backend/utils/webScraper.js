@@ -1,4 +1,4 @@
-// web scrapper
+// web scraper
 const puppeteer = require("puppeteer");
 
 exports.scrapAnchorHrefs = async (webPageURL, options) => {

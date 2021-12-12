@@ -10,23 +10,29 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
 // utils
-const webScrapper = require("./utils/webScrapper");
+const webScraper = require("./utils/webScraper");
 const utils = require("./utils");
 const { v4: uuidv4 } = require("uuid");
-
-const findInNodesByName = (name, nodes) => nodes.find((e) => e.name === name);
 
 // returns the nodes and links appended to the graph sent with the request
 app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const webPageURL = req.body.webPageURL;
 
+  const startTimeStamp = new Date().getTime();
+
+  const currentTime = req.body.currentTime;
+
+  console.log(currentTime);
+
   if (!webPageURL.match(utils.urlRegex)) {
+    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.badURL,
       webPageId: webPageInNodes.id,
+      elapsedTime: new Date().getTime() - startTimeStamp,
     });
     return;
   }
@@ -36,7 +42,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const webPageName = utils.deriveWebPageName(String(webPageURL));
 
   // already visited
-  const findInExistingGraph = findInNodesByName(
+  const findInExistingGraph = utils.findInNodesByName(
     webPageName,
     currentGraph.nodes
   );
@@ -44,29 +50,30 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     findInExistingGraph &&
     currentGraph.nodes.some((e) => e.source === findInExistingGraph.id)
   ) {
+    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
       success: true,
       msg: utils.errorDictionary.alreadyVisited,
       webPageId: -1,
+      elapsedTime: new Date().getTime() - startTimeStamp,
     });
     return;
   }
 
-  // run the web scrapper (time-costly)
-  const allAnchorHrefs = await webScrapper.scrapAnchorHrefs(
-    webPageURL,
-    options
-  );
+  // run the web scraper (time-costly)
+  const allAnchorHrefs = await webScraper.scrapAnchorHrefs(webPageURL, options);
 
   if (allAnchorHrefs === -1) {
+    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.cantNavigate,
       webPageId: -1,
+      elapsedTime: new Date().getTime() - startTimeStamp,
     });
     return;
   }
@@ -76,19 +83,21 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       e.match(utils.urlRegex) && e !== "" && e !== "#" && !e.includes("mailto")
   );
 
-  console.log("pureAnchorHrefs", pureAnchorHrefs);
+  // console.log("pureAnchorHrefs", pureAnchorHrefs);
 
   if (
     pureAnchorHrefs.filter(
       (url) => utils.deriveWebPageName(url) !== webPageName
     ).length === 0
   ) {
+    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
       success: false,
       msg: utils.errorDictionary.deadEnd,
       webPageId: -1,
+      elapsedTime: new Date().getTime() - startTimeStamp,
     });
     return;
   }
@@ -102,7 +111,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const novelNodes = utils.uniqBy(
     allAnchorHrefsWithNameAndURL
       .map((e) => {
-        return findInNodesByName(e.name, currentGraph.nodes)
+        return utils.findInNodesByName(e.name, currentGraph.nodes)
           ? false
           : { ...e, id: uuidv4() };
       })
@@ -117,17 +126,17 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   );
 
   // get the complete object of the newly navigated web page
-  const webPageInNodes = findInNodesByName(webPageName, nodes);
+  const webPageInNodes = utils.findInNodesByName(webPageName, nodes);
 
   const linkTargetsAlreadyInCurrentGraph = allAnchorHrefsWithNameAndURL
-    .filter((e) => findInNodesByName(e.name, currentGraph.nodes))
-    .map((e) => findInNodesByName(e.name, currentGraph.nodes));
+    .filter((e) => utils.findInNodesByName(e.name, currentGraph.nodes))
+    .map((e) => utils.findInNodesByName(e.name, currentGraph.nodes));
 
   const novelLinkTargets = novelNodes.filter(
-    (e) => !findInNodesByName(e.name, currentGraph.nodes)
+    (e) => !utils.findInNodesByName(e.name, currentGraph.nodes)
   );
 
-  console.log([...linkTargetsAlreadyInCurrentGraph, ...novelLinkTargets]);
+  // console.log([...linkTargetsAlreadyInCurrentGraph, ...novelLinkTargets]);
 
   // all new source-target tuples
   const linksToAppend = [
@@ -144,13 +153,15 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   // console.log("links", links);
   // console.log("nodes", nodes);
-
+  console.log("# of new links", linksToAppend.length);
+  console.log(new Date().getTime() - startTimeStamp);
   res.status(200).json({
     nodes,
     links,
     success: true,
     msg: utils.errorDictionary.ok,
     webPageId: webPageInNodes.id,
+    elapsedTime: new Date().getTime() - startTimeStamp,
   });
   return;
 });

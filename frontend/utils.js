@@ -27,6 +27,11 @@ import {
   getCurrentGraph,
   setEgocentricMovementIntervalId,
   getEgocentricMovementIntervalId,
+  initTimer,
+  getTimer,
+  getTimeDifference,
+  getBackendElapsedTime,
+  incrementBackendElapsedTime,
 } from "./state";
 
 const linkHasCurrentNodeAsSource = ({ source, target }) => {
@@ -130,7 +135,8 @@ const moveForwards = () => {
   }, 200);
 };
 
-const apiConnector = (webPageURL, currentGraph, endpointURL) => {
+const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
+  console.log(currentTimer);
   return fetch(`http://10.101.249.13:8000/${endpointURL}`, {
     method: "POST",
     headers: {
@@ -140,6 +146,7 @@ const apiConnector = (webPageURL, currentGraph, endpointURL) => {
     body: JSON.stringify({
       webPageURL,
       currentGraph,
+      currentTime: currentTimer,
     }),
   });
 };
@@ -219,9 +226,12 @@ const clickHandler = async (node) => {
     await apiConnector(
       node.url,
       readNodesAndLinks(),
+      getTimeDifference(),
       "get-neighboring-web-pages-as-graph"
     )
   ).json();
+
+  incrementBackendElapsedTime(apiResponse.elapsedTime);
 
   setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
 
@@ -309,10 +319,15 @@ const submitURLHandler = async (event) => {
   document.getElementById("loader-wrapper").style.display = "block";
   document.getElementById("starting-web-page-input").value = "";
 
+  initTimer();
+
+  console.log(getTimer());
+
   const apiResponse = await (
     await apiConnector(
       inputValue,
       readNodesAndLinks(),
+      getTimeDifference(),
       "get-neighboring-web-pages-as-graph"
     )
   ).json();

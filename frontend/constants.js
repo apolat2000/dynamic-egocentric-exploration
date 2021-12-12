@@ -5,7 +5,17 @@ const isProduction = false;
 
 // const defaultURL = "https://apolat2000.github.io/";
 // const defaultURL = "https://moodle.rwth-aachen.de/";
-const defaultURL = "https://www.instagram.com/astarwth/?hl=en";
+// const defaultURL = "https://www.instagram.com/astarwth/?hl=en";
+// const defaultURL = "https://www.aachen.de/";
+// const defaultURL =
+//   "https://www.google.com/search?client=firefox-b-d&q=network+socket"; // 12 outgoing links
+// const defaultURL = "https://en.wikipedia.org/wiki/Network_socket"; // 52 outgoing links
+
+const defaultURL =
+  "https://www.google.com/search?client=firefox-b-d&q=scripttaal+nl+wiki"; //(13) "https://nl.wikipedia.org/wiki/Scripttaal"(57)
+
+// const defaultURL =
+//   "https://www.google.com/search?client=firefox-b-d&q=fatih+nederlands"; //(12) "https://nl.wikipedia.org/wiki/Fatih" (55)
 
 const nodeSize = 4;
 const nodeResolution = nodeSize * 2;
