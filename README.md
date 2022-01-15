@@ -1,1 +1,1 @@
-# Dynamic Graph Exploration
+# Dynamic Webgraph Exploration
