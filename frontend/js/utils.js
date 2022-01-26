@@ -278,13 +278,6 @@ const clickHandler = async (node) => {
   return;
 };
 
-const findNodeByName = (name) => {
-  return document
-    .getElementById("forcegraph")
-    .getAttribute("forcegraph")
-    .nodes.find((e) => e.name == name);
-};
-
 const findNodeById = (id) => {
   return document
     .getElementById("forcegraph")
