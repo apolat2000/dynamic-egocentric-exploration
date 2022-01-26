@@ -61,9 +61,9 @@ const nodeObjectHandler = (node) => {
     nodeResolution()
   );
   let material;
-  if (getDeadEndNodes().includes(node.id))
-    material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  else if (node.id === getCurrentNodeId())
+  if (getDeadEndNodes().includes(node.id) /* is dead end */)
+    material = new THREE.MeshBasicMaterial({ color: 0xff0000 /* red */ });
+  else if (node.id === getCurrentNodeId() /* is current node */)
     material = new THREE.MeshBasicMaterial(
       getExploratoryInterface() === "free"
         ? { color: 0x00ff00 /* green */ }
@@ -73,12 +73,12 @@ const nodeObjectHandler = (node) => {
     getExploratoryInterface() !== "free" &&
     nodeIsChildOfCurrentNode(node.id)
   )
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  // green
+    material = new THREE.MeshBasicMaterial({ color: 0x00ff00 /* green */ });
   else if (getVisitedNodes().includes(node.id))
-    material = new THREE.MeshBasicMaterial({ color: 0x999900 });
-  // yellow
-  else material = new THREE.MeshBasicMaterial({ color: 0x778899 }); // gray
+    material = new THREE.MeshBasicMaterial({
+      color: 0x999900 /* yellow */,
+    });
+  else material = new THREE.MeshBasicMaterial({ color: 0x778899 /* gray */ });
   const mesh = new THREE.Mesh(geometry, material);
   return mesh;
 };
