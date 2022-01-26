@@ -1,15 +1,9 @@
 import {
   frameGraphAttributeAppend,
-  urlRegex,
-  explorationType,
-  promptMessages,
-  nodeSize,
   nodeResolution,
   linkWidth,
-  linkColor,
-  linkOpacity,
-  defaultURL,
-} from "./constants";
+} from "./derived";
+import { urlRegex, promptMessages } from "./constants";
 import {
   setLoading,
   getLoading,
@@ -30,9 +24,15 @@ import {
   initTimer,
   getTimer,
   getTimeDifference,
-  getBackendElapsedTime,
   incrementBackendElapsedTime,
-} from "./state";
+} from "./store/runtime";
+import {
+  getNodeSize,
+  getExploratoryInterface,
+  getLinkColor,
+  getLinkOpacity,
+  getDefaultURL,
+} from "./store/settings";
 
 const linkHasCurrentNodeAsSource = ({ source, target }) => {
   return getCurrentNodeId() === source;
@@ -58,20 +58,23 @@ const nodeIsChildOfCurrentNode = (id) => {
 
 const nodeObjectHandler = (node) => {
   const geometry = new THREE.SphereGeometry(
-    nodeSize,
-    nodeResolution,
-    nodeResolution
+    getNodeSize(),
+    nodeResolution(),
+    nodeResolution()
   );
   let material;
   if (getDeadEndNodes().includes(node.id))
     material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
   else if (node.id === getCurrentNodeId())
     material = new THREE.MeshBasicMaterial(
-      explorationType === "free"
+      getExploratoryInterface() === "free"
         ? { color: 0x00ff00 /* green */ }
         : { visible: false }
     );
-  else if (explorationType !== "free" && nodeIsChildOfCurrentNode(node.id))
+  else if (
+    getExploratoryInterface() !== "free" &&
+    nodeIsChildOfCurrentNode(node.id)
+  )
     material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   // green
   else if (getVisitedNodes().includes(node.id))
@@ -85,21 +88,25 @@ const nodeObjectHandler = (node) => {
 const linkObjectHandler = (link) => {
   let geometry;
   let material;
-  if (explorationType === "free") {
-    geometry = new THREE.CylinderGeometry(linkWidth, linkWidth, 2, 2);
+  if (getExploratoryInterface() === "free") {
+    geometry = new THREE.CylinderGeometry(linkWidth(), linkWidth(), 2, 2);
     material = new THREE.MeshLambertMaterial({
-      color: linkColor,
-      opacity: linkOpacity,
+      color: getLinkColor(),
+      opacity: getLinkOpacity(),
       transparent: true,
-      visible: !linkHasCurrentNodeAsSource(link) || explorationType === "free",
+      visible:
+        !linkHasCurrentNodeAsSource(link) ||
+        getExploratoryInterface() === "free",
     });
   } else {
     geometry = new THREE.CylinderGeometry(0.4, 0.4, 2, 2);
     material = new THREE.MeshLambertMaterial({
-      color: linkColor,
-      opacity: linkOpacity,
+      color: getLinkColor(),
+      opacity: getLinkOpacity(),
       transparent: true,
-      visible: !linkHasCurrentNodeAsSource(link) || explorationType === "free",
+      visible:
+        !linkHasCurrentNodeAsSource(link) ||
+        getExploratoryInterface() === "free",
     });
   }
   return new THREE.Mesh(geometry, material);
@@ -140,7 +147,7 @@ const moveForwards = () => {
 
 const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
   console.log(currentTimer);
-  return fetch(`http://10.101.249.13:8000/${endpointURL}`, {
+  return fetch(`http://localhost:8000/${endpointURL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -178,7 +185,7 @@ const setNodesAndLinks = (newGraph) => {
   const el = document.getElementById("forcegraph");
   el.setAttribute(
     "forcegraph",
-    `nodes: ${nodes}; links: ${links}; ${frameGraphAttributeAppend}`
+    `nodes: ${nodes}; links: ${links}; ${frameGraphAttributeAppend()}`
   );
 };
 
@@ -191,12 +198,12 @@ const clickHandler = async (node) => {
 
   if (getDeadEndNodes().includes(node.id)) return;
 
-  if (explorationType !== "free")
+  if (getExploratoryInterface() !== "free")
     clearInterval(getEgocentricMovementIntervalId());
 
   // already visited
   if (readNodesAndLinks().links.some((e) => e.source === node.id)) {
-    if (explorationType === "free")
+    if (getExploratoryInterface() === "free")
       document
         .querySelector("#forcegraph-tooltip")
         .setAttribute(
@@ -207,7 +214,8 @@ const clickHandler = async (node) => {
     setTimeout(function () {
       const nodePosition = getCurrentNodePosition();
       setCurrentNodePosition(nodePosition);
-      if (explorationType !== "free") moveCameraToPosition(nodePosition);
+      if (getExploratoryInterface() !== "free")
+        moveCameraToPosition(nodePosition);
     }, 1);
     return;
   }
@@ -260,7 +268,7 @@ const clickHandler = async (node) => {
 
   setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
 
-  if (explorationType !== "free")
+  if (getExploratoryInterface() !== "free")
     setEgocentricMovementIntervalId(
       window.setInterval(
         () =>
@@ -302,11 +310,9 @@ const hoverHandler = (node) => {
       .setAttribute("value", node ? node.name : "");
 };
 
-const submitURLHandler = async (event) => {
-  event.preventDefault();
-
+const submitURLHandler = async () => {
   const inputValue =
-    document.getElementById("starting-web-page-input").value || defaultURL;
+    document.getElementById("starting-web-page-input").value || getDefaultURL();
 
   if (!inputValue.match(urlRegex)) {
     window.alert("Bad webPageURL.");
@@ -360,7 +366,7 @@ const submitURLHandler = async (event) => {
   document.getElementById("usage-blocker").style.display = "none";
 
   setLoading(false);
-  if (apiResponse && explorationType !== "free") {
+  if (apiResponse && getExploratoryInterface() !== "free") {
     setEgocentricMovementIntervalId(
       window.setInterval(
         () =>

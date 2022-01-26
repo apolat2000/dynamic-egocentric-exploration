@@ -14,20 +14,91 @@
     <div class="starting-modal" id="starting-modal">
       <div id="starting-form-wrapper">
         <h1>Starting web page URL:</h1>
-        <form action="" method="get" class="starting-form">
-          <input
-            type="url"
-            name="starting-web-page"
-            id="starting-web-page-input"
-            style="width: 100%"
-          />
-          <button
-            id="starting-web-page-submit"
-            type="submit"
-            style="margin-left: 2rem"
+        <form action="" method="get">
+          <div style="width: 100%">
+            <input
+              type="url"
+              name="starting-web-page"
+              id="starting-web-page-input"
+              style="width: calc(100% - 9px)"
+            />
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              margin-top: 1rem;
+              width: 100%;
+            "
           >
-            Start
-          </button>
+            <button id="starting-web-page-submit" type="submit">Start</button>
+            <p
+              id="show-settings"
+              style="margin-top: 2rem; margin-bottom: 0; cursor: pointer"
+            >
+              Show settings
+            </p>
+
+            <div id="settings-wrapper" style="display: none">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  padding-top: 1rem;
+                  padding-bottom: 1rem;
+                "
+              >
+                <select name="exploratory-interface" id="exploratory-interface">
+                  <option value="egoHighlight">Ego Highlight</option>
+                  <option value="free">Free flight</option>
+                </select>
+                <div>
+                  <input type="checkbox" id="show-stats" name="show-stats" />
+                  <label for="show-stats">Show stats</label>
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between">
+                <div>
+                  <label for="default-url">Default URL:</label>
+                  <input type="text" name="default url" id="default-url" />
+                </div>
+                <button>Save</button>
+              </div>
+              <div
+                style="
+                  margin-top: 1rem;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>
+                  <label for="node-size">Node size:</label>
+                  <input type="number" id="node-size" style="width: 3rem" />
+                </div>
+                <div>
+                  <label for="link-opacity">Link opacity:</label>
+                  <input type="number" id="link-opacity" style="width: 3rem" />
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 1rem;
+                  display: flex;
+                  justify-content: space-between;
+                "
+              >
+                <div>
+                  <label for="link-color">Link color:</label>
+                  <input type="text" id="link-color" style="width: 6rem" />
+                </div>
+                <div>
+                  <label for="link-color">FOV:</label>
+                  <input type="number" id="fov" style="width: 4rem" />
+                </div>
+              </div>
+            </div>
+          </div>
         </form>
       </div>
       <div id="loader-wrapper" class="loader">
@@ -38,7 +109,11 @@
     <div id="usage-blocker"></div>
     <a-scene id="a-frame-scene">
       <a-entity position="0 20 50" id="camera-rig">
-        <a-camera id="camera" look-controls="pointerLockEnabled: true">
+        <a-camera
+          fov="120"
+          id="camera"
+          look-controls="pointerLockEnabled: true"
+        >
           <a-text
             id="forcegraph-tooltip"
             position="0 -0.25 -1"
@@ -61,6 +136,6 @@
       <a-entity id="forcegraph"></a-entity>
       <a-sky color="#002"></a-sky>
     </a-scene>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

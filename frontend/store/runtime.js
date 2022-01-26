@@ -1,4 +1,4 @@
-import { findNodeById } from "./utils";
+import { findNodeById } from "../utils";
 
 let loading;
 let inVR = false;

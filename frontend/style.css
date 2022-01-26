@@ -13,6 +13,11 @@
 .starting-form {
   display: flex;
   justify-content: space-between;
+  margin-top: 1rem;
+}
+
+button {
+  cursor: pointer;
 }
 
 .loader {
