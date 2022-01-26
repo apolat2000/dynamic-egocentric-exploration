@@ -1,1 +1,1 @@
-# Dynamic Webgraph Exploration
+# Dynamic Egocentric Exploration
