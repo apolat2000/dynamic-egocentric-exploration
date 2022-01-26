@@ -1,15 +1,14 @@
 const getLocalStorageExploratoryInterface = () =>
-  JSON.parse(localStorage.getItem("exploratoryInterface"));
-const getLocalStorageDefaultURL = () =>
-  JSON.parse(localStorage.getItem("defaultURL"));
+  localStorage.getItem("exploratoryInterface");
+const getLocalStorageDefaultURL = () => localStorage.getItem("defaultURL");
 const getLocalStorageIsShowingStats = () =>
-  JSON.parse(localStorage.getItem("isShowingStats"));
+  localStorage.getItem("isShowingStats") === "true";
 const getLocalStorageNodeSize = () =>
-  JSON.parse(localStorage.getItem("nodeSize"));
-const getLocalStorageLinkColor = () =>
-  JSON.parse(localStorage.getItem("linkColor"));
+  parseInt(localStorage.getItem("nodeSize"), 10);
+const getLocalStorageLinkColor = () => localStorage.getItem("linkColor");
 const getLocalStorageLinkOpacity = () =>
-  JSON.parse(localStorage.getItem("linkOpacity"));
+  parseInt(localStorage.getItem("linkOpacity"));
+const getLocalStorageFOV = () => parseInt(localStorage.getItem("fov"));
 
 const setLocalStorageExploratoryInterface = (payload) => {
   if (["free", "egoHighlight"].includes(payload))
@@ -30,6 +29,9 @@ const setLocalStorageLinkColor = (payload) => {
 const setLocalStorageLinkOpacity = (payload) => {
   localStorage.setItem("linkOpacity", payload);
 };
+const setLocalStorageFOV = (payload) => {
+  localStorage.setItem("fov", payload);
+};
 
 export {
   getLocalStorageExploratoryInterface,
@@ -38,10 +40,12 @@ export {
   getLocalStorageNodeSize,
   getLocalStorageLinkColor,
   getLocalStorageLinkOpacity,
+  getLocalStorageFOV,
   setLocalStorageExploratoryInterface,
   setLocalStorageDefaultURL,
   setLocalStorageIsShowingStats,
   setLocalStorageNodeSize,
   setLocalStorageLinkColor,
   setLocalStorageLinkOpacity,
+  setLocalStorageFOV,
 };

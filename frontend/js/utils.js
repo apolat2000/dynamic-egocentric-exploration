@@ -50,7 +50,6 @@ const linkIsConnectedToCurrentNode = ({ source, target }) => {
 };
 
 const nodeIsChildOfCurrentNode = (id) => {
-  console.log(getCurrentGraph().links);
   return getCurrentGraph().links.some(
     (e) => e.target === id && e.source === getCurrentNodeId()
   );
@@ -132,7 +131,6 @@ const moveForwards = () => {
     y: posY,
     z: posZ,
   } = new THREE.Vector3().setFromMatrixPosition(camera.object3D.matrixWorld);
-  console.log(posX, posY, posZ);
   const rot = camera.getAttribute("rotation");
   rig.setAttribute(
     "animation",
@@ -146,7 +144,6 @@ const moveForwards = () => {
 };
 
 const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
-  console.log(currentTimer);
   return fetch(`http://localhost:8000/${endpointURL}`, {
     method: "POST",
     headers: {
@@ -320,8 +317,6 @@ const submitURLHandler = async () => {
     return;
   }
 
-  setLoading(true);
-
   document.getElementById("starting-web-page-submit").disabled = true;
   document.getElementById("starting-web-page-input").disabled = true;
   document.getElementById("starting-form-wrapper").style.display = "none";
@@ -329,8 +324,6 @@ const submitURLHandler = async () => {
   document.getElementById("starting-web-page-input").value = "";
 
   initTimer();
-
-  console.log(getTimer());
 
   const apiResponse = await (
     await apiConnector(
@@ -365,7 +358,6 @@ const submitURLHandler = async () => {
   document.getElementById("starting-modal").style.display = "none";
   document.getElementById("usage-blocker").style.display = "none";
 
-  setLoading(false);
   if (apiResponse && getExploratoryInterface() !== "free") {
     setEgocentricMovementIntervalId(
       window.setInterval(

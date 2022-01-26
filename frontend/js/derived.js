@@ -13,7 +13,9 @@ const arrowLength = () => (getExploratoryInterface() === "free" ? 6 : 0);
 
 const frameGraphAttributeAppend = () => `num-dimensions: 3; link-curvature: ${
   getExploratoryInterface() === "free" ? "0.05" : "-0.5"
-}; link-directional-arrow-length: ${arrowLength()}; link-color: ${getLinkColor()};
+}; link-directional-arrow-length: ${arrowLength()}; link-color: 0x${getLinkColor().toString(
+  16
+)};
 link-opacity: ${getLinkOpacity()}; node-auto-color-by: isBeingHovered; link-width: ${linkWidth()};
 link-directional-arrow-rel-pos: 1; node-rel-size: ${getNodeSize()}; node-three-object: node => nodeObjectHandler(node);
 link-three-object: link => linkObjectHandler(link);
