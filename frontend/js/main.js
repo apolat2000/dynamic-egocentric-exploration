@@ -1,11 +1,4 @@
-import {
-  hoverHandler,
-  clickHandler,
-  submitURLHandler,
-  nodeObjectHandler,
-  linkObjectHandler,
-  moveForwards,
-} from "./utils";
+import { submitURLHandler, moveForwards } from "./utils";
 import {
   frameGraphAttributeAppend,
   cameraWasdAttributeAppend,
@@ -46,12 +39,6 @@ import {
 } from "./localStorage/controller";
 
 setLoading(true);
-
-/* Expose globally */
-window.clickHandler = clickHandler;
-window.hoverHandler = hoverHandler;
-window.nodeObjectHandler = nodeObjectHandler;
-window.linkObjectHandler = linkObjectHandler;
 
 /* get HTML elements which should be referenced and manipulated */
 const startingWebPageInputElement = document.getElementById(

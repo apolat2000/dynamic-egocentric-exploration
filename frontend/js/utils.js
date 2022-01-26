@@ -363,6 +363,12 @@ const submitURLHandler = async () => {
   }
 };
 
+/* Expose globally */
+window.clickHandler = clickHandler;
+window.hoverHandler = hoverHandler;
+window.nodeObjectHandler = nodeObjectHandler;
+window.linkObjectHandler = linkObjectHandler;
+
 export {
   readNodesAndLinks,
   setNodesAndLinks,
