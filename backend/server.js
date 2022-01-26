@@ -22,10 +22,7 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const currentTime = req.body.currentTime;
 
-  console.log(currentTime);
-
   if (!webPageURL.match(utils.urlRegex)) {
-    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
@@ -50,7 +47,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     findInExistingGraph &&
     currentGraph.nodes.some((e) => e.source === findInExistingGraph.id)
   ) {
-    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
@@ -66,7 +62,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const allAnchorHrefs = await webScraper.scrapAnchorHrefs(webPageURL, options);
 
   if (allAnchorHrefs === -1) {
-    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
@@ -83,14 +78,11 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
       e.match(utils.urlRegex) && e !== "" && e !== "#" && !e.includes("mailto")
   );
 
-  // console.log("pureAnchorHrefs", pureAnchorHrefs);
-
   if (
     pureAnchorHrefs.filter(
       (url) => utils.deriveWebPageName(url) !== webPageName
     ).length === 0
   ) {
-    console.log(new Date().getTime() - startTimeStamp);
     res.status(200).json({
       nodes: currentGraph.nodes,
       links: currentGraph.links,
@@ -136,8 +128,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
     (e) => !utils.findInNodesByName(e.name, currentGraph.nodes)
   );
 
-  // console.log([...linkTargetsAlreadyInCurrentGraph, ...novelLinkTargets]);
-
   // all new source-target tuples
   const linksToAppend = [
     ...linkTargetsAlreadyInCurrentGraph,
@@ -151,10 +141,6 @@ app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
 
   const links = [...currentGraph.links, ...linksToAppend];
 
-  // console.log("links", links);
-  // console.log("nodes", nodes);
-  console.log("# of new links", linksToAppend.length);
-  console.log(new Date().getTime() - startTimeStamp);
   res.status(200).json({
     nodes,
     links,
