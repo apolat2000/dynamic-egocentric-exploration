@@ -33,19 +33,8 @@ import {
   getDefaultURL,
 } from "./store/settings";
 
-const linkHasCurrentNodeAsSource = ({ source, target }) => {
+const linkHasCurrentNodeAsSource = ({ source }) => {
   return getCurrentNodeId() === source;
-};
-
-const linkHasCurrentNodeAsTarget = ({ source, target }) => {
-  return getCurrentNodeId() === target;
-};
-
-const linkIsConnectedToCurrentNode = ({ source, target }) => {
-  return (
-    linkHasCurrentNodeAsSource({ source, target }) ||
-    linkHasCurrentNodeAsTarget({ source, target })
-  );
 };
 
 const nodeIsChildOfCurrentNode = (id) => {
