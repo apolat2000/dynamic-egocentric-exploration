@@ -58,13 +58,6 @@
                   <label for="show-stats">Show stats</label>
                 </div>
               </div>
-              <div style="display: flex; justify-content: space-between">
-                <div>
-                  <label for="default-url">Default URL:</label>
-                  <input type="text" name="default url" id="default-url" />
-                </div>
-                <button>Save</button>
-              </div>
               <div
                 style="
                   margin-top: 1rem;
@@ -98,9 +91,28 @@
                 </div>
               </div>
               <div
-                style="display: flex; justify-content: center; margin-top: 1rem"
+                style="
+                  display: flex;
+                  justify-content: center;
+                  margin-top: 1rem;
+                  padding-bottom: 1rem;
+                  border-bottom: 1px solid;
+                "
               >
                 <button id="save-configuration">Save configuration</button>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  margin-top: 1rem;
+                "
+              >
+                <div>
+                  <label for="default-url">Default URL:</label>
+                  <input type="text" name="default url" id="default-url" />
+                </div>
+                <button id="save-default-url">Save</button>
               </div>
             </div>
           </div>

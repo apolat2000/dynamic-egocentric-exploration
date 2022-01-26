@@ -63,6 +63,7 @@ const exploratoryInterfaceElement = document.getElementById(
 );
 const showStatsElement = document.getElementById("show-stats");
 const defaultURLElement = document.getElementById("default-url");
+const saveDefaultURLElement = document.getElementById("save-default-url");
 const linkColorElement = document.getElementById("link-color");
 const nodeSizeElement = document.getElementById("node-size");
 const linkOpacityElement = document.getElementById("link-opacity");
@@ -115,6 +116,13 @@ saveConfigurationButtonElement.addEventListener("click", function (e) {
   setLocalStorageLinkColor(Number(linkColorElement.value));
   setLocalStorageLinkOpacity(linkOpacityElement.value);
   setLocalStorageFOV(fovElement.value);
+});
+
+saveDefaultURLElement.addEventListener("click", function (e) {
+  e.preventDefault();
+
+  setLocalStorageDefaultURL(defaultURLElement.value);
+  startingWebPageInputElement.value = defaultURLElement.value;
 });
 
 // first URL input
