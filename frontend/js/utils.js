@@ -22,7 +22,6 @@ import {
   setEgocentricMovementIntervalId,
   getEgocentricMovementIntervalId,
   initTimer,
-  getTimer,
   getTimeDifference,
   incrementBackendElapsedTime,
 } from "./store/runtime";
