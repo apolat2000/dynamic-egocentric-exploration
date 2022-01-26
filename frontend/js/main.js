@@ -45,15 +45,15 @@ import {
   setLocalStorageFOV,
 } from "./localStorage/controller";
 
-/* INIT */
 setLoading(true);
 
-// expose globally
+/* Expose globally */
 window.clickHandler = clickHandler;
 window.hoverHandler = hoverHandler;
 window.nodeObjectHandler = nodeObjectHandler;
 window.linkObjectHandler = linkObjectHandler;
 
+/* get HTML elements which should be referenced and manipulated */
 const startingWebPageInputElement = document.getElementById(
   "starting-web-page-input"
 );
@@ -77,25 +77,10 @@ const submitButtonElement = document.getElementById("starting-web-page-submit");
 const saveConfigurationButtonElement =
   document.getElementById("save-configuration");
 
+// If the localStorage is empty, fill it with the very default values
 initLocalStorage();
+// If the localStorage was not empty, overwrite the default values with the data from localStorage
 initStore();
-
-sceneElement.addEventListener("enter-vr", function () {
-  // when "0 - 25 -1", the text is not visible in VR (Android phone Firefox browser)
-  aText.setAttribute("position", "0 -0.25 -3");
-  setInVR(true);
-});
-sceneElement.addEventListener("exit-vr", function () {
-  aText.setAttribute("position", "0 -0.25 -1");
-  setInVR(false);
-});
-
-showSettingsElement.addEventListener("mousedown", function () {
-  const currentDisplay = settingsWrapper.style.display;
-  settingsWrapper.style.display = currentDisplay !== "none" ? "none" : "block";
-  showSettingsElement.innerHTML =
-    currentDisplay !== "none" ? "Show settings" : "Hide settings";
-});
 
 /* Setting defaults values for the settings form inputs*/
 startingWebPageInputElement.value = getDefaultURL();
@@ -106,6 +91,22 @@ nodeSizeElement.value = getNodeSize();
 linkOpacityElement.value = getLinkOpacity();
 fovElement.value = getFOV();
 
+/* Add event listeners */
+sceneElement.addEventListener("enter-vr", function () {
+  // when "0 - 25 -1", the text is not visible in VR (Android phone Firefox browser)
+  aText.setAttribute("position", "0 -0.25 -3");
+  setInVR(true);
+});
+sceneElement.addEventListener("exit-vr", function () {
+  aText.setAttribute("position", "0 -0.25 -1");
+  setInVR(false);
+});
+showSettingsElement.addEventListener("mousedown", function () {
+  const currentDisplay = settingsWrapper.style.display;
+  settingsWrapper.style.display = currentDisplay !== "none" ? "none" : "block";
+  showSettingsElement.innerHTML =
+    currentDisplay !== "none" ? "Show settings" : "Hide settings";
+});
 saveConfigurationButtonElement.addEventListener("click", function (e) {
   e.preventDefault();
 
@@ -117,15 +118,12 @@ saveConfigurationButtonElement.addEventListener("click", function (e) {
   setLocalStorageLinkOpacity(linkOpacityElement.value);
   setLocalStorageFOV(fovElement.value);
 });
-
 saveDefaultURLElement.addEventListener("click", function (e) {
   e.preventDefault();
 
   setLocalStorageDefaultURL(defaultURLElement.value);
   startingWebPageInputElement.value = defaultURLElement.value;
 });
-
-// first URL input
 submitButtonElement.addEventListener(
   "click",
   async function (e) {

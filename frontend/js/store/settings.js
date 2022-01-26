@@ -3,7 +3,7 @@ let defaultURL = "https://moodle.rwth-aachen.de/";
 let isShowingStats = false;
 
 let nodeSize = 4;
-let linkColor = 16777215;
+let linkColor = 16777215; // 0xffffff
 let linkOpacity = 0.2;
 
 let fov = 80;
