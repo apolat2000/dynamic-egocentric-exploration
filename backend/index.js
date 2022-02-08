@@ -14,22 +14,6 @@ const webScraper = require("./utils/webScraper");
 const utils = require("./utils");
 const { v4: uuidv4 } = require("uuid");
 
-// Add headers before the routes are defined
-app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'https://loving-cray-70ab1a.netlify.app');
-
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-    // Pass to next layer of middleware
-    next();
-});
-
 // returns the nodes and links appended to the graph sent with the request
 app.post("/get-neighboring-web-pages-as-graph", async function (req, res) {
   const webPageURL = req.body.webPageURL;
