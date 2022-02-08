@@ -4,6 +4,7 @@ frontend/dist
 frontend/dist-ssr
 frontend/*.local
 frontend/package-lock.json
+frontend/.env
 
 backend/node_modules
 backend/.DS_Store
