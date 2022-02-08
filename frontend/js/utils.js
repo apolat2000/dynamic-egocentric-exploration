@@ -132,7 +132,7 @@ const moveForwards = () => {
 };
 
 const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
-  return fetch(`http://localhost:8000/${endpointURL}`, {
+  return fetch(`${process.env.BACKEND_URL}/${endpointURL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
