@@ -18,6 +18,7 @@ import {
   getLinkOpacity,
   getDefaultURL,
   getFOV,
+  getIsShowingStats,
   setExploratoryInterface,
   setIsShowingStats,
   setNodeSize,
@@ -124,7 +125,7 @@ submitButtonElement.addEventListener(
     setLinkColor(linkColorElement.value);
     setFOV(document.getElementById("fov").value);
 
-    sceneElement.setAttribute("stats", eIValue);
+    sceneElement.setAttribute("stats", getIsShowingStats());
     forcegraphElement.setAttribute("forcegraph", frameGraphAttributeAppend());
     cameraElement.setAttribute("wasd-controls", cameraWasdAttributeAppend());
     cameraElement.setAttribute("position", cameraPositionAttributeAppend());
