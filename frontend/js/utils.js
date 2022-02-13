@@ -132,7 +132,7 @@ const moveForwards = () => {
 };
 
 const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
-  return fetch(`${import.meta.env.VITE_BACKEND_URL}/${endpointURL}`, {
+  return fetch(`https://test.ahmetpolat.de/${endpointURL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
