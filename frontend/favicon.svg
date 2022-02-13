@@ -1,11 +1,20 @@
 <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .favicon-line {
+            stroke: black
+        }
 
- <g>
-  <title>Layer 1</title>
-  <line id="svg_3" y2="8.34985" x2="22.79373" y1="56.02427" x1="9.30536" stroke="#000" fill="none"/>
-  <line id="svg_4" y2="8.34985" x2="23.02629" y1="55.55915" x1="31.8635" stroke="#000" fill="none"/>
-  <line id="svg_5" y2="7.88473" x2="40.93327" y1="54.62892" x1="40.70071" stroke="#000" fill="none"/>
-  <line id="svg_7" y2="22.53589" x2="55.11931" y1="8.11729" x1="40.93327" stroke="#000" fill="none"/>
-  <line id="svg_8" y2="22.12773" x2="55.52748" y1="33.93124" x1="40.93327" stroke="#000" fill="none"/>
- </g>
+        @media (prefers-color-scheme: dark) {
+            .favicon-line {
+                stroke: white
+            }
+        }
+    </style>
+    <g>
+        <line y2="8.34985" x2="22.79373" y1="56.02427" x1="9.30536" class="favicon-line" fill="none" />
+        <line y2="8.34985" x2="23.02629" y1="55.55915" x1="31.8635" class="favicon-line" fill="none" />
+        <line y2="7.88473" x2="40.93327" y1="54.62892" x1="40.70071" class="favicon-line" fill="none" />
+        <line y2="22.53589" x2="55.11931" y1="8.11729" x1="40.93327" class="favicon-line" fill="none" />
+        <line y2="22.12773" x2="55.52748" y1="33.93124" x1="40.93327" class="favicon-line" fill="none" />
+    </g>
 </svg>
