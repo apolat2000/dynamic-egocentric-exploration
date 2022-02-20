@@ -2,8 +2,8 @@ import {
   frameGraphAttributeAppend,
   nodeResolution,
   linkWidth,
-} from "./derived";
-import { urlRegex, promptMessages } from "./constants";
+} from './derived';
+import { urlRegex, promptMessages } from './constants';
 import {
   setLoading,
   getLoading,
@@ -24,14 +24,14 @@ import {
   initTimer,
   getTimeDifference,
   incrementBackendElapsedTime,
-} from "./store/runtime";
+} from './store/runtime';
 import {
   getNodeSize,
   getExploratoryInterface,
   getLinkColor,
   getLinkOpacity,
   getDefaultURL,
-} from "./store/settings";
+} from './store/settings';
 
 const linkHasCurrentNodeAsSource = ({ source }) => {
   return getCurrentNodeId() === source;
@@ -54,12 +54,12 @@ const nodeObjectHandler = (node) => {
     material = new THREE.MeshBasicMaterial({ color: 0xff0000 /* red */ });
   else if (node.id === getCurrentNodeId() /* is current node */)
     material = new THREE.MeshBasicMaterial(
-      getExploratoryInterface() === "free"
+      getExploratoryInterface() === 'free'
         ? { color: 0x00ff00 /* green */ }
         : { visible: false }
     );
   else if (
-    getExploratoryInterface() !== "free" &&
+    getExploratoryInterface() !== 'free' &&
     nodeIsChildOfCurrentNode(node.id)
   )
     material = new THREE.MeshBasicMaterial({ color: 0x00ff00 /* green */ });
@@ -75,7 +75,7 @@ const nodeObjectHandler = (node) => {
 const linkObjectHandler = (link) => {
   let geometry;
   let material;
-  if (getExploratoryInterface() === "free") {
+  if (getExploratoryInterface() === 'free') {
     geometry = new THREE.CylinderGeometry(linkWidth(), linkWidth(), 2, 2);
     material = new THREE.MeshLambertMaterial({
       color: getLinkColor(),
@@ -83,7 +83,7 @@ const linkObjectHandler = (link) => {
       transparent: true,
       visible:
         !linkHasCurrentNodeAsSource(link) ||
-        getExploratoryInterface() === "free",
+        getExploratoryInterface() === 'free',
     });
   } else {
     geometry = new THREE.CylinderGeometry(0.4, 0.4, 2, 2);
@@ -93,35 +93,35 @@ const linkObjectHandler = (link) => {
       transparent: true,
       visible:
         !linkHasCurrentNodeAsSource(link) ||
-        getExploratoryInterface() === "free",
+        getExploratoryInterface() === 'free',
     });
   }
   return new THREE.Mesh(geometry, material);
 };
 
 const moveCameraToPosition = ({ x, y, z }) => {
-  const rig = document.getElementById("camera-rig");
+  const rig = document.getElementById('camera-rig');
   rig.setAttribute(
-    "animation",
+    'animation',
     `property: position; dur: 800; to: ${x} ${y} ${z}; easing: linear;`
   );
   setTimeout(() => {
-    rig.setAttribute("position", ` ${x} ${y} ${z}`);
+    rig.setAttribute('position', ` ${x} ${y} ${z}`);
   }, 800);
   return;
 };
 
 const moveForwards = () => {
-  const camera = document.getElementById("camera");
-  const rig = document.getElementById("camera-rig");
+  const camera = document.getElementById('camera');
+  const rig = document.getElementById('camera-rig');
   const {
     x: posX,
     y: posY,
     z: posZ,
   } = new THREE.Vector3().setFromMatrixPosition(camera.object3D.matrixWorld);
-  const rot = camera.getAttribute("rotation");
+  const rot = camera.getAttribute('rotation');
   rig.setAttribute(
-    "animation",
+    'animation',
     `property: position; dur: 200; to: ${posX - rot.y / 10} ${
       posY + rot.x / 10
     } ${posZ}; easing: linear;`
@@ -132,11 +132,11 @@ const moveForwards = () => {
 };
 
 const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
-  return fetch(`https://test.ahmetpolat.de/${endpointURL}`, {
-    method: "POST",
+  return fetch(`${import.meta.env.VITE_BACKEND_URL}/${endpointURL}`, {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      // 'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
+      'X-API-KEY': import.meta.env.VITE_REQUEST_SECRET,
     },
     body: JSON.stringify({
       webPageURL,
@@ -147,8 +147,8 @@ const apiConnector = (webPageURL, currentGraph, currentTimer, endpointURL) => {
 };
 
 const readNodesAndLinks = () => {
-  const el = document.getElementById("forcegraph");
-  const attr = el.getAttribute("forcegraph");
+  const el = document.getElementById('forcegraph');
+  const attr = el.getAttribute('forcegraph');
   const links = attr.links.map((e) => ({
     source: e.source.id,
     target: e.target.id,
@@ -167,9 +167,9 @@ const setNodesAndLinks = (newGraph) => {
   const links = JSON.stringify(
     newGraph.links.map((e) => ({ source: e.source, target: e.target }))
   );
-  const el = document.getElementById("forcegraph");
+  const el = document.getElementById('forcegraph');
   el.setAttribute(
-    "forcegraph",
+    'forcegraph',
     `nodes: ${nodes}; links: ${links}; ${frameGraphAttributeAppend()}`
   );
 };
@@ -183,23 +183,23 @@ const clickHandler = async (node) => {
 
   if (getDeadEndNodes().includes(node.id)) return;
 
-  if (getExploratoryInterface() !== "free")
+  if (getExploratoryInterface() !== 'free')
     clearInterval(getEgocentricMovementIntervalId());
 
   // already visited
   if (readNodesAndLinks().links.some((e) => e.source === node.id)) {
-    if (getExploratoryInterface() === "free")
+    if (getExploratoryInterface() === 'free')
       document
-        .querySelector("#forcegraph-tooltip")
+        .querySelector('#forcegraph-tooltip')
         .setAttribute(
-          "value",
-          promptMessages.get("nothingNew").replace("#", node.name)
+          'value',
+          promptMessages.get('nothingNew').replace('#', node.name)
         );
 
     setTimeout(function () {
       const nodePosition = getCurrentNodePosition();
       setCurrentNodePosition(nodePosition);
-      if (getExploratoryInterface() !== "free")
+      if (getExploratoryInterface() !== 'free')
         moveCameraToPosition(nodePosition);
     }, 1);
     return;
@@ -209,40 +209,41 @@ const clickHandler = async (node) => {
   setLoadingNodeName(node.name);
 
   document
-    .querySelector("#forcegraph-tooltip")
+    .querySelector('#forcegraph-tooltip')
     .setAttribute(
-      "value",
-      promptMessages.get("loading").replace("#", getLoadingNodeName())
+      'value',
+      promptMessages.get('loading').replace('#', getLoadingNodeName())
     );
 
-  document.getElementById("loader-wrapper").style.display = "block";
-  document.getElementById("usage-blocker").style.display = "block";
+  document.getElementById('loader-wrapper').style.display = 'block';
+  document.getElementById('usage-blocker').style.display = 'block';
 
   const apiResponse = await (
     await apiConnector(
       node.url,
       readNodesAndLinks(),
       getTimeDifference(),
-      "get-neighboring-web-pages-as-graph"
+      'get-neighboring-web-pages-as-graph'
     )
   ).json();
 
   incrementBackendElapsedTime(apiResponse.elapsedTime);
 
-  setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
+  if (apiResponse.success)
+    setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
 
-  document.getElementById("loader-wrapper").style.display = "none";
-  document.getElementById("usage-blocker").style.display = "none";
+  document.getElementById('loader-wrapper').style.display = 'none';
+  document.getElementById('usage-blocker').style.display = 'none';
 
   setLoadingNodeName(null);
   setLoading(false);
 
-  if (apiResponse.msg === "cantNavigate" || apiResponse.msg === "deadEnd") {
+  if (apiResponse.msg === 'cantNavigate' || apiResponse.msg === 'deadEnd') {
     document
-      .querySelector("#forcegraph-tooltip")
+      .querySelector('#forcegraph-tooltip')
       .setAttribute(
-        "value",
-        promptMessages.get(apiResponse.msg).replace("#", node.name)
+        'value',
+        promptMessages.get(apiResponse.msg).replace('#', node.name)
       );
     addToDeadEndNodes(node.id);
     findNodeById(node.id).__threeObj.material.color = new THREE.Color(0xff0000);
@@ -253,7 +254,7 @@ const clickHandler = async (node) => {
 
   setNodesAndLinks({ nodes: apiResponse.nodes, links: apiResponse.links });
 
-  if (getExploratoryInterface() !== "free")
+  if (getExploratoryInterface() !== 'free')
     setEgocentricMovementIntervalId(
       window.setInterval(
         () =>
@@ -269,40 +270,40 @@ const clickHandler = async (node) => {
 
 const findNodeById = (id) => {
   return document
-    .getElementById("forcegraph")
-    .getAttribute("forcegraph")
+    .getElementById('forcegraph')
+    .getAttribute('forcegraph')
     .nodes.find((e) => e.id == id);
 };
 
 const hoverHandler = (node) => {
   if (getLoading())
     document
-      .querySelector("#forcegraph-tooltip")
+      .querySelector('#forcegraph-tooltip')
       .setAttribute(
-        "value",
-        promptMessages.get("loading").replace("#", getLoadingNodeName())
+        'value',
+        promptMessages.get('loading').replace('#', getLoadingNodeName())
       );
   else
     document
-      .querySelector("#forcegraph-tooltip")
-      .setAttribute("value", node ? node.name : "");
+      .querySelector('#forcegraph-tooltip')
+      .setAttribute('value', node ? node.name : '');
 };
 
 const submitURLHandler = async () => {
   const inputValue =
-    document.getElementById("starting-web-page-input").value || getDefaultURL();
+    document.getElementById('starting-web-page-input').value || getDefaultURL();
 
   if (!inputValue.match(urlRegex)) {
-    window.alert("Bad webPageURL.");
-    document.getElementById("starting-web-page-input").value = "";
+    window.alert('Bad webPageURL.');
+    document.getElementById('starting-web-page-input').value = '';
     return;
   }
 
-  document.getElementById("starting-web-page-submit").disabled = true;
-  document.getElementById("starting-web-page-input").disabled = true;
-  document.getElementById("starting-form-wrapper").style.display = "none";
-  document.getElementById("loader-wrapper").style.display = "block";
-  document.getElementById("starting-web-page-input").value = "";
+  document.getElementById('starting-web-page-submit').disabled = true;
+  document.getElementById('starting-web-page-input').disabled = true;
+  document.getElementById('starting-form-wrapper').style.display = 'none';
+  document.getElementById('loader-wrapper').style.display = 'block';
+  document.getElementById('starting-web-page-input').value = '';
 
   initTimer();
 
@@ -311,19 +312,20 @@ const submitURLHandler = async () => {
       inputValue,
       readNodesAndLinks(),
       getTimeDifference(),
-      "get-neighboring-web-pages-as-graph"
+      'get-neighboring-web-pages-as-graph'
     )
   ).json();
 
-  setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
+  if (apiResponse.success)
+    setCurrentGraph({ nodes: apiResponse.nodes, links: apiResponse.links });
 
   if (!apiResponse.success) {
     window.alert(promptMessages.get(apiResponse.msg));
-    document.getElementById("starting-web-page-submit").disabled = false;
-    document.getElementById("starting-web-page-input").disabled = false;
-    document.getElementById("loader-wrapper").style.display = "none";
-    document.getElementById("starting-form-wrapper").style.display = "block";
-    document.getElementById("usage-blocker").style.display = "block";
+    document.getElementById('starting-web-page-submit').disabled = false;
+    document.getElementById('starting-web-page-input').disabled = false;
+    document.getElementById('loader-wrapper').style.display = 'none';
+    document.getElementById('starting-form-wrapper').style.display = 'block';
+    document.getElementById('usage-blocker').style.display = 'block';
     return;
   }
 
@@ -336,10 +338,10 @@ const submitURLHandler = async () => {
 
   setCurrentNodeId(apiResponse.webPageId);
 
-  document.getElementById("starting-modal").style.display = "none";
-  document.getElementById("usage-blocker").style.display = "none";
+  document.getElementById('starting-modal').style.display = 'none';
+  document.getElementById('usage-blocker').style.display = 'none';
 
-  if (apiResponse && getExploratoryInterface() !== "free") {
+  if (apiResponse && getExploratoryInterface() !== 'free') {
     setEgocentricMovementIntervalId(
       window.setInterval(
         () =>
