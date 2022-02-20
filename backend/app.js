@@ -6,7 +6,6 @@ const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
-const { v4: uuidv4 } = require('uuid');
 
 // load internal modules
 const router = require('./lib/router');
