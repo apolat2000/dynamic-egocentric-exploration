@@ -36,6 +36,6 @@ app.get('/', function (req, res) {
 // Setup API router => /api/v1
 app.use('/api/v1', router);
 
-app.listen(process.env.APP_PORT, () => {
+app.listen(process.env.APP_PORT || 8000, () => {
   console.log(`Server started on port ${process.env.APP_PORT}`);
 });
